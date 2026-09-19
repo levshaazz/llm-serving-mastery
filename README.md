@@ -15,6 +15,7 @@ Course site and lecture decks. Published at **https://levshaazz.github.io/llm-se
 npm ci
 npm run build        # site → docs/, decks assembled and copied into docs/Lectures/
 npm run dev          # local site
+scripts/publish.sh   # build + push docs/ to gh-pages (the Pages source)
 open Lectures/00-introduction.html   # after `npm run deck`
 ```
 
