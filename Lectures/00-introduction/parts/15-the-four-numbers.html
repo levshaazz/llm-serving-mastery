@@ -1,0 +1,32 @@
+<section class="slide" data-type="table" data-screen-label="15 The four numbers">
+          <div class="slide-header">
+            <h2><span lang="en">The four numbers we will measure all term</span></h2>
+            <span class="slide-kicker"><span lang="en">Same numbers in the demo, the labs and the leaderboard</span></span>
+          </div>
+          <table class="cmp-table">
+            <thead>
+              <tr>
+                <th><span lang="en">Metric</span></th>
+                <th><span lang="en">In the kitchen</span></th>
+                <th><span lang="en">Definition</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>TTFT</strong></td><td><span lang="en">time to the first bite</span></td><td><span lang="en">time to first token: from sending the request to receiving the first streamed token</span></td></tr>
+              <tr><td><strong>TPOT</strong></td><td><span lang="en">pace between courses</span></td><td><span lang="en">time per output token after the first (a.k.a. inter-token latency)</span></td></tr>
+              <tr><td><strong><span lang="en">Throughput</span></strong></td><td><span lang="en">plates per hour</span></td><td><span lang="en">output tokens per second, summed over all concurrent requests</span></td></tr>
+              <tr><td><strong>p95</strong></td><td><span lang="en">the unluckiest tables</span></td><td><span lang="en">the value 95% of requests beat — averages hide the guests who leave</span></td></tr>
+            </tbody>
+          </table>
+          <div class="callout" data-kind="info">
+            <div class="callout-icon">i</div>
+            <div class="callout-body">
+              <strong><span lang="en">The trade-off you will live in</span></strong>
+              <p><span lang="en">Bigger batches raise throughput and usually hurt TTFT and TPOT. Every configuration choice in this course is a point on that curve.</span></p>
+            </div>
+          </div>
+          <aside class="slide-notes">Define these now so the demo reads naturally. Plus two non-negotiables we always report: failed requests (timeouts, OOM) and quality — a fast server that answers wrong is not a server.</aside>
+        </section>
+
+        <!-- ============================================ PAUSE · predict ============================================ -->
+        

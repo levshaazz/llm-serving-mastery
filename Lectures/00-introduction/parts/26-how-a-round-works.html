@@ -1,0 +1,48 @@
+<section class="slide" data-type="arch" data-screen-label="26 How a round works">
+          <div class="slide-header">
+            <h2><span lang="en">How a round works</span></h2>
+            <span class="slide-kicker"><span lang="en">Fully automatic — no manual steps on my side</span></span>
+          </div>
+          <div class="arch-diagram">
+            <div class="arch-node" data-color="violet">
+              <div class="arch-icon">git</div>
+              <div class="arch-name"><span lang="en">Your repo</span></div>
+              <div class="arch-shape"><span lang="en">tag <code>round-NN</code></span></div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node">
+              <div class="arch-icon">⤓</div>
+              <div class="arch-name"><span lang="en">Clean checkout</span></div>
+              <div class="arch-shape"><span lang="en">on the judge</span></div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node" data-color="cyan">
+              <div class="arch-icon">:8000</div>
+              <div class="arch-name"><span lang="en"><code>serve.sh</code></span></div>
+              <div class="arch-shape"><span lang="en">OpenAI-compatible</span></div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node" data-color="amber">
+              <div class="arch-icon">✓</div>
+              <div class="arch-name"><span lang="en">Quality gate</span></div>
+              <div class="arch-shape">lm-eval</div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node" data-color="red">
+              <div class="arch-icon">⏱</div>
+              <div class="arch-name"><span lang="en">Speed</span></div>
+              <div class="arch-shape">GuideLLM</div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node" data-color="green">
+              <div class="arch-icon">#</div>
+              <div class="arch-name"><span lang="en">Public board</span></div>
+              <div class="arch-shape"><span lang="en">+ run logs</span></div>
+            </div>
+          </div>
+          <p class="small muted mt-4 center"><span lang="en">Judge: 1 × RTX 5070 Ti (Blackwell, 16 GB). Round deadlines: TBA.</span></p>
+          <aside class="slide-notes">The judge checks out exactly your tag in a clean environment, runs serve.sh, waits until /v1/models lists the model "submission", runs the quality gate, then the speed benchmark, and publishes results with the full logs. If your server does not come up, the log tells you why. A dry run every week lets you see your submission start on Blackwell before it counts.</aside>
+        </section>
+
+        <!-- ============================================ CODE · the contract ============================================ -->
+        

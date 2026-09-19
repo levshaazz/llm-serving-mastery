@@ -1,0 +1,27 @@
+<section class="slide" data-type="formula" data-screen-label="11 Decode is memory-bound">
+          <div class="slide-header" style="border:none; padding-bottom:0;">
+            <h2><span lang="en">Why one order at a time wastes the stove</span></h2>
+            <span class="slide-kicker"><span lang="en">Every decode step reads all the weights</span></span>
+          </div>
+          <div class="formula-stage">
+            $$ t_{\text{step}} \;\gtrsim\; \frac{\text{bytes of weights}}{\text{memory bandwidth}} \;=\; \frac{8\ \text{GB}}{896\ \text{GB/s}} \;\approx\; 9\ \text{ms} $$
+          </div>
+          <div class="formula-caption">
+            <div class="var-block">
+              <div class="var-symbol">B = 1</div>
+              <div class="var-desc"><span lang="en">One token per step for one request →<br /><strong>≤ ~110 tokens/s</strong>, no matter how fast the math units are.</span></div>
+            </div>
+            <div class="var-block">
+              <div class="var-symbol">B = 64</div>
+              <div class="var-desc"><span lang="en">The <em>same</em> weight read serves 64 requests →<br />ceiling <strong>~64× higher</strong>, until compute or memory runs out.</span></div>
+            </div>
+            <div class="var-block">
+              <div class="var-symbol">⇒</div>
+              <div class="var-desc"><span lang="en">Batching is <strong>almost free</strong> in decode.<br />A serial server throws it away.</span></div>
+            </div>
+          </div>
+          <aside class="slide-notes">Example: a 4B-parameter model in BF16 = 8 GB of weights; the judge GPU (RTX 5070 Ti) has about 896 GB/s of memory bandwidth. To produce one token, the GPU has to stream every weight from memory once: ≈ 9 ms. So a single request is capped near 110 tokens/s — the arithmetic units sit mostly idle, waiting for memory. If 64 requests decode in the same step, the weights are read once and used 64 times: the ceiling goes up ~64×, until you become compute-bound or run out of memory for the KV cache (next slides). This is a lower bound on step time and an upper bound on speed — real numbers are lower. Topic 2 does this properly (roofline, arithmetic intensity).</aside>
+        </section>
+
+        <!-- ============================================ MISCONCEPTION · faster GPU ============================================ -->
+        

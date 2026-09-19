@@ -1,0 +1,34 @@
+<section class="slide" data-type="two-col" data-screen-label="30 The defense">
+          <div class="slide-header">
+            <h2><span lang="en">The defense: tell the story of your kitchen</span></h2>
+            <span class="slide-kicker"><span lang="en">Mandatory · 10%</span></span>
+          </div>
+          <div class="twocol">
+            <div class="twocol-col">
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">JOURNAL.md · example entry</span></div>
+                <pre><code class="language-markdown">## Round 04 — prefix caching, more seqs
+Hypothesis: prompts share a long system
+  prompt → reuse its KV instead of recomputing.
+Change: --enable-prefix-caching,
+  --max-num-seqs 64 → 96
+Judge:  c=64 tok/s  +30 %,  p95 TTFT −0.7 s
+Kept:   yes. Next: FP8 KV cache.</code></pre>
+              </div>
+              <ul class="obj-list mt-3">
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en">Every change: hypothesis → measurement → decision.</span></span></li>
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en">Failed experiments count — they are half the story.</span></span></li>
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en">Explain <em>why</em> it worked, not only that it did.</span></span></li>
+              </ul>
+            </div>
+            <div class="twocol-col">
+              <div class="viz-frame" style="padding:0; overflow:hidden;">
+                <img src="assets/img/L0/L0-06-journal.webp?v=1" alt="Serega presenting a recipe notebook with a line climbing step by step from v1 to v10" style="width:100%; height:auto; display:block;" />
+              </div>
+            </div>
+          </div>
+          <aside class="slide-notes">The defense is the narrative of your engineering solution: from round 1 to round 10, what you changed, what you expected, what the judge measured, what you kept and what you threw away — and how that path got you to your place on the board. The journal is its raw material; write an entry every round, while you still remember why. The numbers in the example entry are invented for illustration.</aside>
+        </section>
+
+        <!-- ============================================ DIVIDER — Part 05 ============================================ -->
+        

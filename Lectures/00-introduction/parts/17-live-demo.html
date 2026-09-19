@@ -1,0 +1,46 @@
+<section class="slide" data-type="two-col" data-screen-label="17 Live demo">
+          <div class="slide-header">
+            <h2><span lang="en">Live demo: pipeline vs vLLM</span></h2>
+            <span class="slide-kicker"><span lang="en">Colab · T4 · same model, same GPU, two servers</span></span>
+          </div>
+          <div class="twocol">
+            <div class="twocol-col">
+              <table class="cmp-table">
+                <thead>
+                  <tr>
+                    <th><span lang="en">Clients</span></th>
+                    <th><span lang="en">pipeline tok/s</span></th>
+                    <th><span lang="en">vLLM tok/s</span></th>
+                    <th><span lang="en">pipeline p95 TTFT</span></th>
+                    <th><span lang="en">vLLM p95 TTFT</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+                  <tr><td>8</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+                  <tr><td>32</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+                  <tr><td>64</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+                </tbody>
+              </table>
+              <p class="small muted mt-3"><span lang="en">Filled in live. The notebook prints this exact table; failed requests (60 s client timeout) are reported next to it.</span></p>
+            </div>
+            <div class="twocol-col">
+              <div class="qr-block">
+                <div class="qr-canvas" data-qr="https://colab.research.google.com/github/levshaazz/llm-serving-mastery/blob/main/seminars/00-live-demo-pipeline-vs-vllm.ipynb"></div>
+                <div class="qr-caption">
+                  <span lang="en">Run it yourself</span>
+                  <span class="qr-url">seminars/00-live-demo-pipeline-vs-vllm.ipynb</span>
+                </div>
+              </div>
+              <ul class="obj-list mt-3">
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">1</span><span class="obj-text"><span lang="en">Naive server: <code>pipeline</code> + one lock</span></span></li>
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">2</span><span class="obj-text"><span lang="en">vLLM OpenAI-compatible server</span></span></li>
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">3</span><span class="obj-text"><span lang="en">One asyncio load client for both</span></span></li>
+              </ul>
+            </div>
+          </div>
+          <aside class="slide-notes">Switch to Colab. The notebook: (1) starts a deliberately naive OpenAI-compatible server around transformers.pipeline, one request at a time; (2) fires 1, 8, 32, 64 concurrent streaming clients and records TTFT, throughput and failures; (3) stops it, starts vLLM with the same model, repeats; (4) prints this table and a plot, and polls vLLM's /metrics during the 64-client run so you can watch "requests running" climb to 64. Fill the blanks with the printed numbers, then compare with the predictions from the previous slide. Colab's T4 has 320 GB/s of bandwidth, so absolute numbers are smaller than on the judge — the ratio is the point.</aside>
+        </section>
+
+        <!-- ============================================ TABLE · kitchen dictionary ============================================ -->
+        

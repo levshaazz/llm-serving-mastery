@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, t, withBase, localizedPath } from '../../i18n/locales.js';
+import { ui } from '../../i18n/ui.js';
+import { course } from '../../lib/course.js';
+
+export function getStaticPaths() {
+  return LOCALES.map((l) => ({ params: { lang: l } }));
+}
+const { lang } = Astro.params;
+const m = course.meta;
+const a = course.assessment;
+const blockTitle = Object.fromEntries(course.blocks.map((b) => [b.id, b.title]));
+---
+<BaseLayout lang={lang} page="syllabus" title={t(ui.nav.syllabus, lang)}>
+  <div class="wrap">
+    <section class="block">
+      <h2>{t(m.title, lang)}: {t(m.subtitle, lang)}</h2>
+      <div class="kicker">{t(m.term, lang)}</div>
+      <p class="sub">{t(course.goal, lang)}</p>
+      <div class="meta">
+        <div><div class="k">{t(ui.labels.instructor, lang)}</div><div class="v">{m.instructor}</div></div>
+        <div><div class="k">{t(ui.labels.level, lang)}</div><div class="v">{t(m.level, lang)}</div></div>
+        <div><div class="k">{t(ui.labels.audience, lang)}</div><div class="v">{t(m.audience, lang)}</div></div>
+        <div><div class="k">{t(ui.labels.format, lang)}</div><div class="v">{t(m.format, lang)}</div></div>
+        <div><div class="k">{t(ui.labels.workload, lang)}</div><div class="v">{t(m.workload, lang)}</div></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>{t(ui.sections.outcomes, lang)}</h2>
+      <ul class="reading">{course.outcomes.map((o) => <li>{t(o, lang)}</li>)}</ul>
+    </section>
+
+    <section class="block">
+      <h2>{t(ui.sections.prerequisites, lang)}</h2>
+      <ul class="reading">{course.prerequisites.map((p) => <li>{t(p, lang)}</li>)}</ul>
+    </section>
+
+    <section class="block">
+      <h2>{t(ui.sections.topics, lang)}</h2>
+      <div class="kicker">{t(ui.sections.topicsKicker, lang)}</div>
+      <table>
+        <thead><tr><th>#</th><th>{t(ui.labels.lecture, lang)}</th><th>{t(ui.labels.seminar, lang)}</th><th>{t(ui.labels.milestone, lang)}</th></tr></thead>
+        <tbody>
+          {course.topics.map((tp) => (
+            <tr>
+              <td>{tp.n}</td>
+              <td><strong>{t(tp.title, lang)}</strong><br /><span style="color:var(--ink-3);font-size:var(--fz-tiny)">{t(blockTitle[tp.block], lang)}</span></td>
+              <td>{t(tp.seminar, lang)}</td>
+              <td>{t(tp.milestone, lang)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="block">
+      <h2>{t(ui.sections.assessment, lang)}</h2>
+      <table>
+        <thead><tr><th>{t(ui.labels.component, lang)}</th><th>{t(ui.labels.weight, lang)}</th><th>{t(ui.labels.how, lang)}</th></tr></thead>
+        <tbody>
+          {a.components.map((c) => (
+            <tr><td>{t(c.name, lang)}</td><td class="d">{c.weight}%</td><td>{t(c.note, lang)}</td></tr>
+          ))}
+          <tr><td><strong>{t(ui.labels.total, lang)}</strong></td><td class="d"><strong>{a.total}%</strong></td><td></td></tr>
+        </tbody>
+      </table>
+      <p class="grade"><strong>{t(ui.labels.grades, lang)}:</strong>
+        {a.grades.map((g) => <span>{g.band} {g.range}</span>)}
+      </p>
+      <p><strong>{t(ui.labels.policy, lang)}:</strong> {t(a.policy, lang)}</p>
+      <p><a href={localizedPath(lang, 'leaderboard')}>{t(ui.sections.leaderboard, lang)} →</a></p>
+    </section>
+
+    <section class="block">
+      <h2>{t(ui.sections.instructor, lang)}</h2>
+      <div class="inst">
+        <img src={withBase('/Lectures/assets/me.jpeg')} alt={`Portrait of ${m.instructor}`} />
+        <div class="body"><h3>{m.instructor}</h3></div>
+      </div>
+    </section>
+
+    <section class="block" style="border-bottom:none">
+      <h2>{t(ui.sections.reading, lang)}</h2>
+      <div class="kicker">{t(ui.sections.readingKicker, lang)}</div>
+      <ul class="reading">
+        {course.reading.map((r) => (
+          <li>{r.author} — <a href={r.url} target="_blank" rel="noopener"><em>{r.title}</em></a>{r.publisher ? ` (${r.publisher}${r.year ? ', ' + r.year : ''})` : ''}</li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

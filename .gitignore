@@ -1,0 +1,19 @@
+# secrets
+.env
+.env.*
+
+# build output
+node_modules/
+docs/
+.astro/
+# assembled decks — the editable source is Lectures/<slug>/parts/
+Lectures/[0-9][0-9]-*.html
+
+# full-size illustration masters (the deck ships WebP from scripts/optimize_images.py)
+_research/masters/
+
+# notebook runs
+seminars/*.json
+.ipynb_checkpoints/
+__pycache__/
+.DS_Store

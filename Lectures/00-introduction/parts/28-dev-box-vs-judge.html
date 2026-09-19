@@ -1,0 +1,29 @@
+<section class="slide" data-type="table" data-screen-label="28 Dev box vs judge">
+          <div class="slide-header">
+            <h2><span lang="en">Your dev box is not the judge</span></h2>
+            <span class="slide-kicker"><span lang="en">Colab T4 vs RTX 5070 Ti</span></span>
+          </div>
+          <table class="cmp-table">
+            <thead>
+              <tr><th></th><th><span lang="en">Colab T4 (you)</span></th><th><span lang="en">RTX 5070 Ti (judge)</span></th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span lang="en">Architecture</span></td><td>Turing · sm_75</td><td>Blackwell · sm_120</td></tr>
+              <tr><td>VRAM</td><td>16 GB GDDR6</td><td>16 GB GDDR7</td></tr>
+              <tr><td><span lang="en">Memory bandwidth</span></td><td>320 GB/s</td><td class="cell-good">896 GB/s</td></tr>
+              <tr><td>BF16 · FlashAttention-2</td><td class="cell-bad"><span lang="en">no</span></td><td class="cell-good"><span lang="en">yes</span></td></tr>
+              <tr><td><span lang="en">FP8 / FP4 tensor cores</span></td><td class="cell-bad"><span lang="en">no</span></td><td class="cell-good"><span lang="en">yes</span></td></tr>
+            </tbody>
+          </table>
+          <div class="callout" data-kind="warn">
+            <div class="callout-icon">!</div>
+            <div class="callout-body">
+              <strong><span lang="en">What this means for you</span></strong>
+              <p><span lang="en">Develop and debug on Colab; trust only the judge's numbers. Low-precision tricks (FP8, NVFP4) cannot be tested on a T4 — use the weekly dry-run logs to check that they start on Blackwell.</span></p>
+            </div>
+          </div>
+          <aside class="slide-notes">An optimization that wins on the T4 may not transfer, and vice versa: the judge has ~2.8× the memory bandwidth, and supports data types the T4 does not have at all. That is realistic — production hardware is rarely your laptop. Write down in your journal which results came from Colab and which from the judge.</aside>
+        </section>
+
+        <!-- ============================================ TABLE · scoring ============================================ -->
+        

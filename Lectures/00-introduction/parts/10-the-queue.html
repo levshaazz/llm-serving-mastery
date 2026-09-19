@@ -1,0 +1,45 @@
+<section class="slide" data-type="walkthrough" data-max-step="4" data-current-step="0" data-screen-label="10 The queue">
+          <div class="slide-header">
+            <h2><span lang="en">What the 64th guest experiences</span></h2>
+            <span class="slide-kicker"><span lang="en">Back-of-the-envelope · step with →</span></span>
+          </div>
+          <p class="small muted mt-2"><span lang="en">Assume one answer = 256 output tokens, and the naive server generates 40 tokens/s for a single request → <span class="term">6.4 s</span> per order. Orders are served strictly one after another.</span></p>
+          <div class="walk-flow">
+            <div class="walk-step" data-step="1" data-color="green">
+              <div class="walk-num">01</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">1 client</span></div>
+                <div class="walk-detail"><span lang="en">Nobody waits. Looks production-ready.</span></div>
+              </div>
+              <div class="walk-state">6.4 s</div>
+            </div>
+            <div class="walk-step" data-step="2" data-color="accent">
+              <div class="walk-num">02</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">8 clients</span></div>
+                <div class="walk-detail"><span lang="en">The 8th waits for 7 orders before its own: \(8 \times 6.4\) s.</span></div>
+              </div>
+              <div class="walk-state">51 s</div>
+            </div>
+            <div class="walk-step" data-step="3" data-color="amber">
+              <div class="walk-num">03</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">32 clients</span></div>
+                <div class="walk-detail"><span lang="en">\(32 \times 6.4\) s. Most HTTP clients and load balancers time out around here.</span></div>
+              </div>
+              <div class="walk-state">3.4 min</div>
+            </div>
+            <div class="walk-step" data-step="4" data-color="red" data-final="true">
+              <div class="walk-num">04</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">64 clients</span></div>
+                <div class="walk-detail"><span lang="en">\(64 \times 6.4\) s. And the GPU was mostly idle the whole time — the next two slides show why.</span></div>
+              </div>
+              <div class="walk-state">6.8 min</div>
+            </div>
+          </div>
+          <aside class="slide-notes">Illustrative numbers, not measurements — the live demo measures the real ones on a Colab T4. The point is the shape: with a serial server, the wait of the k-th client grows linearly in k, while the throughput stays flat. Adding clients adds only waiting, not work done. Ask: is the GPU busy during these 6.8 minutes? Hold the answer for two slides.</aside>
+        </section>
+
+        <!-- ============================================ FORMULA · decode is memory-bound ============================================ -->
+        

@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "code": "LSM",
+    "title": { "en": "LLM Serving Mastery" },
+    "subtitle": { "en": "vLLM, Multi-GPU, and Production Deployment" },
+    "tagline": { "en": "From a model that runs to a service that survives rush hour: optimization, high-concurrency serving with vLLM, multi-GPU, Kubernetes and LLMOps — measured every week on a public leaderboard." },
+    "instructor": "Albert Nasybullin",
+    "term": { "en": "Dates TBA" },
+    "level": { "en": "Intermediate → Advanced" },
+    "audience": { "en": "ML / LLM engineers, MLOps, DevOps and backend engineers" },
+    "format": { "en": "15 topics · each one a lecture + a hands-on seminar" },
+    "workload": { "en": "≈ 10–14 hours per week, ≈ 150–200 hours in total" },
+    "repo": "https://github.com/levshaazz/llm-serving-mastery",
+    "site": "https://levshaazz.github.io/llm-serving-mastery/"
+  },
+
+  "goal": { "en": "Train an engineer who can optimize an LLM, stand up a high-performance OpenAI-compatible API on vLLM, serve dozens to hundreds of concurrent clients from a single instance, deploy the system on multiple GPUs and Kubernetes, and operate it as LLMOps." },
+
+  "outcomes": [
+    { "en": "Explain where inference time and memory go — prefill vs decode, the KV cache, memory bandwidth — and predict the bottleneck before measuring it." },
+    { "en": "Quantize a model and defend the speed / memory / quality trade-off with numbers." },
+    { "en": "Serve a model through vLLM's OpenAI-compatible API and tune it for a given concurrency profile." },
+    { "en": "Benchmark a serving stack honestly: throughput, TTFT, TPOT, p95, failures — under 1 to 128+ concurrent clients." },
+    { "en": "Package, deploy and scale inference: Docker, tensor parallelism, Kubernetes with GPU Operator and HPA." },
+    { "en": "Operate it: metrics, dashboards, alerts and cost per million tokens." }
+  ],
+
+  "prerequisites": [
+    { "en": "Python — confident; asyncio basics help (we write load generators)." },
+    { "en": "Linux command line and git — you will ship a repository every week." },
+    { "en": "Deep-learning basics — what a transformer forward pass and a token are; PyTorch at the reading level." },
+    { "en": "HTTP / REST basics — requests, JSON, streaming responses." },
+    { "en": "Accounts: GitHub, Hugging Face, Google (for Colab). No prior Docker or Kubernetes needed — taught in the course." }
+  ],
+
+  "blocks": [
+    { "id": "foundations", "title": { "en": "Foundations" },     "kitchen": { "en": "learn the stove" } },
+    { "id": "optimization", "title": { "en": "Optimization" },   "kitchen": { "en": "smaller pans" } },
+    { "id": "vllm",        "title": { "en": "vLLM Core" },        "kitchen": { "en": "the line cook's system" } },
+    { "id": "concurrency", "title": { "en": "High Concurrency" }, "kitchen": { "en": "rush hour" } },
+    { "id": "production",  "title": { "en": "Production API" },   "kitchen": { "en": "the pass & the takeaway box" } },
+    { "id": "infra",       "title": { "en": "Infrastructure" },   "kitchen": { "en": "more stoves, more kitchens" } },
+    { "id": "llmops",      "title": { "en": "LLMOps & Design" },  "kitchen": { "en": "running the restaurant" } }
+  ],
+
+  "topics": [
+    { "n": 1,  "block": "foundations",  "title": { "en": "Modern LLM inference systems & production challenges" },       "seminar": { "en": "Environment setup; running models with transformers.pipeline" },           "milestone": { "en": "Working environment + log of several models running" } },
+    { "n": 2,  "block": "foundations",  "title": { "en": "Inference bottlenecks: KV cache, memory hierarchy, autoregression" }, "seminar": { "en": "GPU profiling and first benchmarks" },                               "milestone": { "en": "Latency / throughput comparison of two models on one GPU" } },
+    { "n": 3,  "block": "optimization", "title": { "en": "Model quantization for production" },                           "seminar": { "en": "Quantize a model, compare the trade-offs" },                                "milestone": { "en": "FP16 vs quantized model + trade-off table" } },
+    { "n": 4,  "block": "vllm",         "title": { "en": "vLLM architecture & OpenAI-compatible serving" },               "seminar": { "en": "Launch vLLM, call it through the OpenAI SDK" },                            "milestone": { "en": "Local OpenAI-compatible server + client" } },
+    { "n": 5,  "block": "vllm",         "title": { "en": "PagedAttention & continuous batching" },                        "seminar": { "en": "vLLM vs transformers.pipeline under moderate load" },                      "milestone": { "en": "First comparative measurement protocol" } },
+    { "n": 6,  "block": "concurrency",  "title": { "en": "High-concurrency serving: one instance, 50–200+ clients" },      "seminar": { "en": "Comparative lab at concurrency 8 / 32 / 64 / 128" },                        "milestone": { "en": "Report: plots, conclusions, the saturation knee" } },
+    { "n": 7,  "block": "concurrency",  "title": { "en": "Tuning vLLM parameters for different concurrency levels" },     "seminar": { "en": "Systematic parameter search under high load" },                            "milestone": { "en": "Configuration table + chosen production profile" } },
+    { "n": 8,  "block": "production",   "title": { "en": "Production inference APIs: FastAPI + vLLM" },                   "seminar": { "en": "FastAPI wrapper with streaming, validation and guardrails" },              "milestone": { "en": "Production-ready endpoint with logging" } },
+    { "n": 9,  "block": "production",   "title": { "en": "Docker for LLM inference" },                                    "seminar": { "en": "Build a lean vLLM image; run a GPU container" },                           "milestone": { "en": "Docker image + deployment instructions" } },
+    { "n": 10, "block": "infra",        "title": { "en": "Multi-GPU inference: tensor parallelism" },                     "seminar": { "en": "tensor-parallel-size = 2 and 4" },                                          "milestone": { "en": "Multi-GPU report: configuration, metrics, conclusions" } },
+    { "n": 11, "block": "infra",        "title": { "en": "Kubernetes for LLM serving: GPU Operator & Helm" },             "seminar": { "en": "Deploy vLLM on Kubernetes with the production-stack Helm chart" },         "milestone": { "en": "Manifests / values.yaml + deployment write-up" } },
+    { "n": 12, "block": "infra",        "title": { "en": "Advanced Kubernetes: single-pod concurrency & HPA" },           "seminar": { "en": "One fat pod vs several light replicas; configure HPA" },                    "milestone": { "en": "Pod-capacity experiment + HPA recommendation" } },
+    { "n": 13, "block": "llmops",       "title": { "en": "LLMOps: observability, monitoring & cost control" },            "seminar": { "en": "Prometheus + Grafana (+ LLM metrics) for vLLM" },                          "milestone": { "en": "Dashboard + list of metrics and alerts" } },
+    { "n": 14, "block": "llmops",       "title": { "en": "Fine-tuning in the serving pipeline: LoRA adapters in vLLM" },  "seminar": { "en": "Serve LoRA / QLoRA adapters from one base model" },                        "milestone": { "en": "Multi-LoRA serving experiment" } },
+    { "n": 15, "block": "llmops",       "title": { "en": "Production best practices, cost optimization & trends" },       "seminar": { "en": "Project defenses and final review" },                                      "milestone": { "en": "Defense of your leaderboard story" } }
+  ],
+
+  "leaderboard": {
+    "rounds": 10,
+    "judge": { "en": "The instructor's workstation · 1 × NVIDIA RTX 5070 Ti (Blackwell, 16 GB GDDR7)" },
+    "devBox": { "en": "Google Colab (free tier: NVIDIA T4, 16 GB)" },
+    "modelRule": { "en": "Any open-weight model that, together with its KV cache for 64 concurrent requests, fits in 16 GB of VRAM. Your choice — and it may change between rounds." },
+    "stackRule": { "en": "Any stack and any kernels: vLLM, SGLang, llama.cpp, TensorRT-LLM, your own CUDA/Triton — as long as the contract holds." },
+    "submission": { "en": "Push a git tag round-NN to your public repository before the round deadline (TBA). The judge checks out exactly that tag." },
+    "contract": [
+      { "file": "submission.yaml", "role": { "en": "model id, stack, key parameters, author" } },
+      { "file": "serve.sh",        "role": { "en": "installs pinned dependencies with uv and starts an OpenAI-compatible server on :8000, model name \"submission\"" } },
+      { "file": "uv.lock",         "role": { "en": "pinned environment — the run must be reproducible from a clean machine" } },
+      { "file": "JOURNAL.md",      "role": { "en": "one entry per round: what changed, why, what it measured — the raw material of your defense" } },
+      { "file": "Dockerfile",      "role": { "en": "optional — if present, the judge uses it instead of serve.sh" } }
+    ],
+    "speed": { "en": "Output tokens/s at concurrency 32 and 64, plus p95 TTFT — GuideLLM on a fixed, hidden prompt set." },
+    "quality": { "en": "A gate, not a score: a subset of GSM8K, MMLU-Pro and IFEval through lm-eval against your endpoint. Below the gate → the round counts as failed." },
+    "ranking": { "en": "Among submissions that pass the quality gate, rank by speed." },
+    "marks": { "en": "Each round is marked 0–5. Clearing that round's speed bar = 5. The bar rises from round to round (baseline of the round + x%). Exact bars and the partial-credit formula: TBA with the leaderboard spec." },
+    "overdrive": { "en": "Top 10% of a round: +2 Overdrive points. Next 10%: +1. Overdrive does not inflate the 40% — it buys exam exemption." },
+    "exemption": { "en": "Overdrive ≥ N (TBA) by the end of round 10 → the final exam is waived and credited at 80% (40 / 50)." },
+    "dryRun": { "en": "Every week the judge publishes a dry-run log, so you can see your submission start on Blackwell before it counts." }
+  },
+
+  "assessment": {
+    "components": [
+      { "id": "exam",        "name": { "en": "Final exam" },              "weight": 50, "note": { "en": "Covers all 15 topics, including multi-GPU and Kubernetes. Can be waived through Overdrive." } },
+      { "id": "leaderboard", "name": { "en": "Leaderboard · 10 rounds" }, "weight": 40, "note": { "en": "10 rounds × mark 0–5 = 50 round-points, scaled to 40%." } },
+      { "id": "defense",     "name": { "en": "Project defense" },         "weight": 10, "note": { "en": "Mandatory. The engineering story of your solution: every change, why, and what it measured." } }
+    ],
+    "total": 100,
+    "grades": [
+      { "band": "A", "range": "[90, 100]" },
+      { "band": "B", "range": "[70, 90)" },
+      { "band": "C", "range": "[50, 70)" },
+      { "band": "D", "range": "[0, 50)" }
+    ],
+    "policy": { "en": "Cheating — zero tolerance. No late submissions: a missed round deadline is a 0 for that round. Gaming the benchmark (caching eval answers, special-casing the prompt set, degrading output to win speed) disqualifies the round." }
+  },
+
+  "lectures": [
+    { "id": "00", "status": "ready", "deckFile": "Lectures/00-introduction.html",
+      "title": { "en": "Introduction: the kitchen at rush hour" },
+      "blurb": { "en": "Course overview, the leaderboard, grading — and a live demo of why a naive pipeline dies at 64 clients." } }
+  ],
+
+  "demo": {
+    "notebook": "seminars/00-live-demo-pipeline-vs-vllm.ipynb",
+    "colab": "https://colab.research.google.com/github/levshaazz/llm-serving-mastery/blob/main/seminars/00-live-demo-pipeline-vs-vllm.ipynb"
+  },
+
+  "reading": [
+    { "author": "Kwon et al.", "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention", "publisher": "SOSP", "year": 2023, "url": "https://arxiv.org/abs/2309.06180" },
+    { "author": "Yu et al.", "title": "Orca: A Distributed Serving System for Transformer-Based Generative Models", "publisher": "OSDI", "year": 2022, "url": "https://www.usenix.org/conference/osdi22/presentation/yu" },
+    { "author": "Dao et al.", "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", "publisher": "NeurIPS", "year": 2022, "url": "https://arxiv.org/abs/2205.14135" },
+    { "author": "Agrawal et al.", "title": "Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve", "publisher": "OSDI", "year": 2024, "url": "https://arxiv.org/abs/2403.02310" },
+    { "author": "Lin et al.", "title": "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration", "publisher": "MLSys", "year": 2024, "url": "https://arxiv.org/abs/2306.00978" },
+    { "author": "vLLM project", "title": "vLLM documentation", "publisher": "", "year": null, "url": "https://docs.vllm.ai/" }
+  ]
+}

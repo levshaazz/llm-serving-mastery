@@ -1,0 +1,41 @@
+<section class="slide" data-type="two-col" data-screen-label="27 The contract">
+          <div class="slide-header">
+            <h2><span lang="en">The submission contract</span></h2>
+            <span class="slide-kicker"><span lang="en">If I cannot run it from a clean machine, it does not count</span></span>
+          </div>
+          <div class="twocol">
+            <div class="twocol-col">
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">your-repo/</span></div>
+                <pre><code class="language-bash">submission.yaml   # model, stack, key params
+serve.sh          # uv sync + start server
+pyproject.toml    # dependencies
+uv.lock           # pinned, reproducible
+JOURNAL.md        # one entry per round
+Dockerfile        # optional: used if present</code></pre>
+              </div>
+              <ul class="obj-list mt-3">
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en"><strong>Model:</strong> any open-weight model that fits in 16 GB <em>with</em> KV cache for 64 concurrent requests.</span></span></li>
+                <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en"><strong>Stack:</strong> anything — vLLM, SGLang, llama.cpp, TensorRT-LLM, your own kernels.</span></span></li>
+              </ul>
+            </div>
+            <div class="twocol-col">
+              <div class="code-block">
+                <div class="code-header"><span class="code-lang">serve.sh · example</span><span class="badge" data-color="accent">bash</span></div>
+                <pre><code class="language-bash">#!/usr/bin/env bash
+set -euo pipefail
+uv sync --frozen
+exec uv run vllm serve Qwen/Qwen3-4B-AWQ \
+  --served-model-name submission \
+  --host 0.0.0.0 --port 8000 \
+  --max-num-seqs 64 \
+  --gpu-memory-utilization 0.92</code></pre>
+              </div>
+              <p class="small muted mt-3"><span lang="en">Fixed: port <code>8000</code>, model name <code>submission</code>, OpenAI-compatible <code>/v1/chat/completions</code> with streaming. Everything else is yours to change.</span></p>
+            </div>
+          </div>
+          <aside class="slide-notes">The contract is strict on purpose: I must be able to literally clone your repository and run it. Pin everything (uv.lock). Do not download things at runtime that are not pinned. The model and the stack are free choices and may change from round to round — that is part of your story. A Dockerfile is optional; if it exists, the judge builds and runs it instead of serve.sh. The example uses vLLM with an AWQ-quantized 4B model; it is an example, not a recommendation.</aside>
+        </section>
+
+        <!-- ============================================ TABLE · dev box vs judge ============================================ -->
+        

@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, t, withBase } from '../../i18n/locales.js';
+import { ui } from '../../i18n/ui.js';
+import { course } from '../../lib/course.js';
+
+export function getStaticPaths() {
+  return LOCALES.map((l) => ({ params: { lang: l } }));
+}
+const { lang } = Astro.params;
+const lb = course.leaderboard;
+const L = ui.leaderboardPage;
+const scoring = [
+  [L.contract, L.contractRule],
+  [L.quality, lb.quality],
+  [L.speed, lb.speed],
+  [L.marks, lb.marks],
+  [L.overdrive, lb.overdrive],
+  [L.exemption, lb.exemption],
+  [L.dryRun, lb.dryRun],
+];
+---
+<BaseLayout lang={lang} page="leaderboard" title={t(ui.nav.leaderboard, lang)}>
+  <div class="cover-banner">
+    <img src={withBase('/Lectures/assets/img/L0/L0-05-scoreboard.webp')} alt="Three student cooks racing at three stoves while Serega judges with a stopwatch in front of a scoreboard" />
+  </div>
+  <div class="wrap">
+    <section class="block">
+      <h2>{t(ui.sections.leaderboard, lang)}</h2>
+      <div class="kicker">{lb.rounds} {t(ui.labels.rounds, lang)}</div>
+      <p class="notice">{t(L.status, lang)}</p>
+      <div class="meta">
+        <div><div class="k">{t(ui.labels.judge, lang)}</div><div class="v">{t(lb.judge, lang)}</div></div>
+        <div><div class="k">{t(ui.labels.devBox, lang)}</div><div class="v">{t(lb.devBox, lang)}</div></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>{t(ui.sections.board, lang)}</h2>
+      <table>
+        <thead><tr><th>#</th><th>GitHub</th><th>{t(ui.labels.model, lang)}</th><th>{t(ui.labels.stack, lang)}</th><th>tok/s @32</th><th>tok/s @64</th><th>p95 TTFT</th><th>Overdrive</th></tr></thead>
+        <tbody><tr><td colspan="8" style="color:var(--ink-3);font-weight:400">{t(L.empty, lang)}</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="block">
+      <h2>{t(ui.sections.contract, lang)}</h2>
+      <p>{t(lb.submission, lang)}</p>
+      <table>
+        <thead><tr><th>{t(ui.labels.file, lang)}</th><th>{t(ui.labels.role, lang)}</th></tr></thead>
+        <tbody>{lb.contract.map((c) => <tr><td class="d">{c.file}</td><td>{t(c.role, lang)}</td></tr>)}</tbody>
+      </table>
+      <p><strong>{t(ui.labels.model, lang)}:</strong> {t(lb.modelRule, lang)}</p>
+      <p><strong>{t(ui.labels.stack, lang)}:</strong> {t(lb.stackRule, lang)}</p>
+    </section>
+
+    <section class="block" style="border-bottom:none">
+      <h2>{t(ui.sections.scoring, lang)}</h2>
+      <div class="kicker">{t(lb.ranking, lang)}</div>
+      <table>
+        <thead><tr><th>{t(ui.labels.step, lang)}</th><th>{t(ui.labels.rule, lang)}</th></tr></thead>
+        <tbody>{scoring.map(([k, v]) => <tr><td>{t(k, lang)}</td><td>{t(v, lang)}</td></tr>)}</tbody>
+      </table>
+      <p><strong>{t(ui.labels.policy, lang)}:</strong> {t(course.assessment.policy, lang)}</p>
+    </section>
+  </div>
+</BaseLayout>

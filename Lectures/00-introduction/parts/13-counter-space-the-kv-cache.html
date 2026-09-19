@@ -1,0 +1,42 @@
+<section class="slide" data-type="two-col" data-screen-label="13 Counter space — the KV cache">
+          <div class="slide-header">
+            <h2><span lang="en">The catch: counter space</span></h2>
+            <span class="slide-kicker"><span lang="en">Every guest's order occupies the KV cache</span></span>
+          </div>
+          <div class="twocol">
+            <div class="twocol-col">
+              <div class="def-card">
+                <span class="def-tag"><span lang="en">KV cache per token</span></span>
+                <div class="def-body">
+                  $$ 2 \times L \times H_{kv} \times d_{h} \times 2\,\text{B} $$
+                  <p><span lang="en">Keys and values, for every layer, every KV head — kept for every token of every live request.</span></p>
+                  <p><span lang="en">A 4B-class model (\(L = 36\), \(H_{kv} = 8\), \(d_h = 128\), FP16): <strong>≈ 144 KiB per token</strong>.</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="twocol-col">
+              <div class="def-card">
+                <span class="def-tag"><span lang="en">16 GB of VRAM, budgeted</span></span>
+                <div class="def-body">
+                  <ul class="obj-list">
+                    <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en">Weights (BF16): <strong>8 GB</strong></span></span></li>
+                    <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en">Runtime, activations: <strong>~2 GB</strong></span></span></li>
+                    <li class="obj-item"><span class="obj-check" aria-hidden="true">·</span><span class="obj-text"><span lang="en">Left for KV: <strong>~6 GB ≈ 40 000 tokens</strong></span></span></li>
+                    <li class="obj-item"><span class="obj-check" aria-hidden="true">×</span><span class="obj-text"><span lang="en">÷ 64 guests = <strong>~630 tokens each</strong></span></span></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="callout" data-kind="warn" style="margin-top:var(--sp-3)">
+                <div class="callout-icon">!</div>
+                <div class="callout-body">
+                  <strong><span lang="en">The real limit</span></strong>
+                  <p><span lang="en">Batching is free in bandwidth, but not in memory. Quantization, paging and cache reuse exist to buy counter space.</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="slide-notes">The arithmetic: 2 (K and V) × 36 layers × 8 KV heads × 128 head dim × 2 bytes = 147 456 bytes ≈ 144 KiB per token. With ~6 GB left after weights and runtime overhead: 6·10⁹ / 147 456 ≈ 40 700 tokens in total, ≈ 636 per request at 64 concurrent requests — prompt plus answer. That is why the leaderboard rule says "the model plus its KV cache for 64 concurrent requests must fit in 16 GB". Every lever you will pull — quantized weights, quantized KV cache, PagedAttention's no-waste allocation, prefix caching — is a way to buy counter space. The architecture numbers are a representative 4B-class configuration; your model's config.json gives its own.</aside>
+        </section>
+
+        <!-- ============================================ ART-HERO · the big wok ============================================ -->
+        

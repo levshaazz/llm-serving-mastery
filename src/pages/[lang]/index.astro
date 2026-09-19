@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, t, withBase, localizedPath } from '../../i18n/locales.js';
+import { ui } from '../../i18n/ui.js';
+import { course } from '../../lib/course.js';
+
+export function getStaticPaths() {
+  return LOCALES.map((l) => ({ params: { lang: l } }));
+}
+const { lang } = Astro.params;
+const m = course.meta;
+const cover = withBase('/Lectures/assets/img/L0/L0-01-rush-hour.webp');
+const blockTitle = Object.fromEntries(course.blocks.map((b) => [b.id, b.title]));
+---
+<BaseLayout lang={lang} page="">
+  <div class="cover-banner">
+    <img src={cover} alt="Serega, the head cook, at one stove while order tickets overflow the rail and hungry guests lean through the hatch" loading="eager" />
+  </div>
+
+  <header class="hero-wrap site-header" style="border-bottom:none;background:none">
+    <div class="wrap hero">
+      <div class="eyebrow">{t(ui.eyebrow, lang)}</div>
+      <h1>{t(m.title, lang)}</h1>
+      <p class="sub"><strong>{t(m.subtitle, lang)}.</strong> {t(m.tagline, lang)}</p>
+      <div class="meta">
+        <div><div class="k">{t(ui.labels.instructor, lang)}</div><div class="v">{m.instructor}</div></div>
+        <div><div class="k">{t(ui.labels.term, lang)}</div><div class="v">{t(m.term, lang)}</div></div>
+        <div><div class="k">{t(ui.labels.level, lang)}</div><div class="v">{t(m.level, lang)}</div></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="block" id="lectures">
+      <h2>{t(ui.sections.lectures, lang)}</h2>
+      <div class="kicker">{t(ui.sections.lecturesKicker, lang)}</div>
+      <div class="cards">
+        {course.lectures.map((lec) => (
+          <div class={`card${lec.status === 'ready' ? '' : ' soon'}`}>
+            <span class={`tag ${lec.status === 'ready' ? 'ready' : 'soon'}`}>
+              {lec.status === 'ready' ? t(ui.labels.ready, lang) : t(ui.labels.coming, lang)}
+            </span>
+            <div class="num">L{lec.id}</div>
+            <h3>{t(lec.title, lang)}</h3>
+            <p>{t(lec.blurb, lang)}</p>
+            <div class="links">
+              {lec.deckFile && <a href={withBase('/' + lec.deckFile)}>{t(ui.labels.openSlides, lang)} →</a>}
+              {lec.id === '00' && <a href={course.demo.colab}>{t(ui.labels.openColab, lang)}</a>}
+            </div>
+          </div>
+        ))}
+        {course.topics.map((tp) => (
+          <div class="card soon">
+            <span class="tag soon">{t(ui.labels.coming, lang)}</span>
+            <div class="num">{t(ui.labels.topic, lang)} {tp.n} · {t(blockTitle[tp.block], lang)}</div>
+            <h3>{t(tp.title, lang)}</h3>
+            <p>{t(ui.labels.seminar, lang)}: {t(tp.seminar, lang)}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="block" style="border-bottom:none">
+      <h2>{t(ui.sections.leaderboard, lang)}</h2>
+      <div class="kicker">{course.leaderboard.rounds} {t(ui.labels.rounds, lang)} · {t(course.leaderboard.judge, lang)}</div>
+      <p class="sub">{t(course.leaderboard.submission, lang)} {t(course.leaderboard.ranking, lang)}</p>
+      <p><a href={localizedPath(lang, 'leaderboard')}>{t(ui.nav.leaderboard, lang)} →</a> · <a href={localizedPath(lang, 'syllabus')}>{t(ui.nav.syllabus, lang)} →</a></p>
+    </section>
+  </div>
+</BaseLayout>
