@@ -98,7 +98,7 @@
   align-self: center;
   border-left: 3px solid var(--rule); padding-left: var(--sp-5); min-width: 280px;
 }
-.seq-budget-head { font-family: var(--font-mono); font-size: var(--fs-label-xs); text-transform: uppercase; letter-spacing: .14em; color: var(--accent-ink); margin-bottom: var(--sp-3); }
+.seq-budget-head { font-family: var(--font-mono); font-size: 20px; text-transform: uppercase; letter-spacing: .14em; color: var(--accent-ink); margin-bottom: var(--sp-3); }
 .seq-budget-row { display: flex; justify-content: space-between; gap: var(--sp-3); font-size: var(--fs-tiny); padding: 4px 0; transition: opacity var(--dur) var(--ease); }
 .seq-budget-row.is-step-hidden { opacity: .12; }
 .seq-budget-row .seq-b-lat { font-family: var(--font-mono); color: var(--ink-2); }

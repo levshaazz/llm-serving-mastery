@@ -167,6 +167,16 @@ JOBS = [
      "blazing compute stove. A long conveyor of tiny ingredient cards travels from the pantry to the "
      "stove for every serving; the stove intermittently waits while the conveyor is packed. No labels, "
      "no plants, and no text. The green tübetey is the ONLY green object."),
+    ("L02", "L02/L02-02-kv-overflow.png", "16:9", True,
+     "TOKEN-BLIND ADMISSION. Serega measures a counter filled with blue memory trays while a few very "
+     "long order scrolls consume the space and push the final trays over the edge. A bare-headed queue "
+     "manager counts tickets instead of their lengths. No labels or text. The green tübetey is the ONLY "
+     "green object."),
+    ("L02", "L02/L02-03-predict-measure.png", "16:9", True,
+     "PREDICT, MEASURE, RECONCILE. Serega runs a controlled GPU-kitchen experiment: a balance compares "
+     "blue memory trays with an orange compute whisk; a probe connects one GPU stove to a monitor with "
+     "abstract timeline, roofline, and memory-bar shapes. Leave the leftmost quarter relatively open. "
+     "No labels or text. The green tübetey is the ONLY green object."),
 ]
 
 H = {"Authorization": f"Bearer {API_KEY}"}

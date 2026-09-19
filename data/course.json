@@ -521,6 +521,18 @@
       "blurb": {
         "en": "Request lifecycle, prefill/decode, production objectives, overload and a reproducible single-GPU baseline."
       }
+    },
+    {
+      "id": "02",
+      "topic": 2,
+      "status": "ready",
+      "deckFile": "Lectures/02-inference-bottlenecks.html",
+      "title": {
+        "en": "Inference bottlenecks: KV cache, memory hierarchy, autoregression"
+      },
+      "blurb": {
+        "en": "Autoregressive dependency, prefill/decode shapes, memory traffic, roofline reasoning, KV-cache accounting and profiler evidence."
+      }
     }
   ],
   "demo": {

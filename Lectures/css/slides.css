@@ -451,6 +451,8 @@
   overflow-x: auto;
   font-size: inherit;
 }
+.code-block.is-wrap pre,
+.code-block.is-wrap code { white-space: pre-wrap; overflow-wrap: anywhere; }
 .code-block code { background: transparent; border: none; padding: 0; font-size: inherit; }
 .code-block.is-dense pre { font-size: var(--fs-code-sm); }
 

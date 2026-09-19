@@ -1,0 +1,76 @@
+/* =========================================================
+   perfmodel.css — reusable quantitative performance widgets.
+   Mount contract: .pm-widget[data-kind="shape|roofline|kv"]
+   with controls carrying data-pm-input and outputs carrying
+   data-pm-output. Logic lives in js/perfmodel.js.
+   ========================================================= */
+.slide[data-type="model-widget"] > .slide-body { display: grid; grid-template-rows: auto 1fr; }
+.pm-widget {
+  display: grid;
+  grid-template-columns: minmax(360px, .72fr) minmax(720px, 1.28fr);
+  gap: var(--sp-5);
+  align-items: stretch;
+  min-height: 610px;
+}
+.pm-controls, .pm-stage {
+  border: 2px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  padding: var(--sp-4);
+}
+.pm-controls { display: grid; align-content: center; gap: var(--sp-4); }
+.pm-control { display: grid; gap: 10px; }
+.pm-control-head { display: flex; justify-content: space-between; gap: var(--sp-3); align-items: baseline; }
+.pm-control label, .pm-control-name {
+  font-family: var(--font-sans); font-size: 24px; font-weight: 650; color: var(--ink);
+}
+.pm-control output {
+  font-family: var(--font-mono); font-size: 25px; font-weight: 650; color: var(--accent-ink);
+}
+.pm-control input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px; }
+.pm-toggle { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.pm-toggle button {
+  border: 2px solid var(--rule-strong); background: var(--bg-alt); color: var(--ink-2);
+  border-radius: var(--r-sm); padding: 14px 18px; font: 650 23px/1 var(--font-sans); cursor: pointer;
+}
+.pm-toggle button.is-active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+.pm-stage { display: grid; align-content: center; gap: var(--sp-4); position: relative; overflow: hidden; }
+.pm-readouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+.pm-readout { background: var(--bg-alt); border-left: 7px solid var(--accent); border-radius: var(--r-sm); padding: 16px 20px; }
+.pm-readout[data-tone="amber"] { border-color: var(--c-amber); }
+.pm-readout[data-tone="green"] { border-color: var(--c-green); }
+.pm-readout[data-tone="red"] { border-color: var(--c-red); }
+.pm-readout-k { font: 600 21px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.pm-readout-v { margin-top: 8px; font: 650 32px/1.1 var(--font-sans); color: var(--ink); }
+.pm-readout-v[data-pm-output] { font-family: var(--font-mono); }
+.pm-equation { font: 500 28px/1.35 var(--font-mono); color: var(--ink-2); text-align: center; }
+.pm-roof { width: 100%; height: 390px; overflow: visible; }
+.pm-roof .axis { stroke: var(--ink-2); stroke-width: 3; }
+.pm-roof .grid { stroke: var(--rule); stroke-width: 2; stroke-dasharray: 6 8; }
+.pm-roof .roof-memory { stroke: var(--c-amber); stroke-width: 8; fill: none; }
+.pm-roof .roof-compute { stroke: var(--accent); stroke-width: 8; fill: none; }
+.pm-roof .pm-point { fill: var(--c-red); stroke: var(--bg); stroke-width: 5; }
+.pm-roof text { fill: var(--ink-2); font: 21px var(--font-mono); }
+.pm-shape-stack { display: grid; gap: 12px; }
+.pm-tensor { display: grid; grid-template-columns: 210px 1fr; align-items: center; gap: var(--sp-3); }
+.pm-tensor-name { font: 600 22px var(--font-sans); color: var(--ink-2); }
+.pm-tensor-bar { min-height: 70px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--accent); background: var(--accent-soft); border-radius: var(--r-sm); font: 650 27px var(--font-mono); color: var(--accent-ink); transition: width var(--dur) var(--ease); }
+.pm-tensor:nth-child(2) .pm-tensor-bar { border-color: var(--c-amber); background: var(--c-amber-soft); color: var(--c-amber-ink); }
+.pm-tensor:nth-child(3) .pm-tensor-bar { border-color: var(--c-green); background: var(--c-green-soft); color: var(--c-green-ink); }
+.pm-capacity { display: grid; gap: 14px; }
+.pm-capacity-track { height: 80px; border: 3px solid var(--ink-2); border-radius: var(--r-sm); overflow: hidden; background: var(--bg-alt); }
+.pm-capacity-fill { height: 100%; width: 0; background: var(--c-green); transition: width var(--dur) var(--ease), background var(--dur) var(--ease); }
+.pm-capacity-fill.is-warn { background: var(--c-amber); }
+.pm-capacity-fill.is-over { background: var(--c-red); }
+.pm-caption { font: 23px/1.35 var(--font-sans); color: var(--ink-2); }
+.pm-widget[data-pm-ready="0"]::after {
+  content: "interactive model failed to mount"; position: absolute; inset: 40% 20%; display: grid;
+  place-items: center; background: var(--c-red-soft); color: var(--c-red); font: 650 28px var(--font-mono);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pm-tensor-bar, .pm-capacity-fill { transition: none; }
+}
+@media print {
+  .pm-widget { grid-template-columns: .72fr 1.28fr; }
+  .pm-control input { print-color-adjust: exact; }
+}

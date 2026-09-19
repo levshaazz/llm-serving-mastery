@@ -70,12 +70,58 @@ for (const deck of decks) {
       walkthrough: ['.walk-flow'],
       archflow: ['.af-stage', '.af-canvas', '.af-panel', '.af-note[data-step="0"]', '.af-node[data-from="0"]'],
       sequence: ['.seq-stage', '.seq-canvas', '.seq-actors', '.seq-msgs', '.seq-budget'],
+      'model-widget': ['.pm-widget[data-kind]', '.pm-controls', '.pm-stage', '[data-pm-output]'],
     };
     return slides.flatMap((slide, index) => (required[slide.dataset.type] || [])
       .filter((selector) => !slide.querySelector(selector))
       .map((selector) => `${String(index + 1).padStart(2, '0')} ${slide.dataset.screenLabel}: template structure missing ${selector}`));
   });
   problems.push(...structuralProblems);
+  const widgetProblems = await page.$$eval('.pm-widget[data-kind]', (widgets) => widgets.flatMap((widget) => {
+    const problems = [];
+    const input = (name) => Number(widget.querySelector(`[data-pm-input="${name}"]`)?.value || 0);
+    const format = (n, digits = 1) => Number(n).toLocaleString('en-US', { maximumFractionDigits: digits });
+    let regression = {};
+    if (widget.dataset.kind === 'shape') {
+      const phase = widget.dataset.phase || 'prefill';
+      const batch = Math.max(1, input('batch'));
+      const prompt = Math.max(1, input('prompt'));
+      const history = Math.max(1, input('history'));
+      const q = phase === 'prefill' ? prompt : 1;
+      const k = phase === 'prefill' ? prompt : history;
+      regression = { phase, queries: `${batch} × ${q}`, attention: `${batch} × H × ${q} × ${k}`, gemm: `M = ${phase === 'prefill' ? batch * prompt : batch}` };
+    } else if (widget.dataset.kind === 'roofline') {
+      const intensity = Math.max(.1, input('intensity'));
+      const compute = Number(widget.dataset.compute || 60);
+      const bandwidth = Number(widget.dataset.bandwidth || 600);
+      const ridge = compute * 1000 / bandwidth;
+      regression = {
+        intensity: `${format(intensity)} FLOP/B`,
+        attainable: `${format(Math.min(compute, bandwidth * intensity / 1000))} TFLOP/s`,
+        ridge: `${format(ridge)} FLOP/B`,
+        regime: intensity < ridge ? 'bandwidth-bound ceiling' : 'compute-bound ceiling',
+      };
+    } else if (widget.dataset.kind === 'kv') {
+      const tokens = Math.max(1, input('sequences')) * Math.max(1, input('context'));
+      const perToken = 2 * Number(widget.dataset.layers || 36) * Math.max(1, input('kvheads')) * Number(widget.dataset.headDim || 128) * Math.max(1, input('bytes'));
+      const gib = perToken * tokens / (2 ** 30);
+      const capacity = Number(widget.dataset.capacityGib || 8);
+      regression = {
+        'per-token': `${format(perToken / 1024, 0)} KiB/token`, tokens: format(tokens, 0), total: `${format(gib, 2)} GiB`,
+        fit: gib <= capacity ? `${format(capacity - gib, 2)} GiB headroom` : `${format(gib - capacity, 2)} GiB over budget`,
+      };
+    }
+    if (widget.dataset.pmReady !== '1') problems.push(`${widget.dataset.kind}: shared widget did not mount`);
+    widget.querySelectorAll('[data-pm-output]').forEach((el) => {
+      if (!el.textContent.trim()) problems.push(`${widget.dataset.kind}: blank output ${el.dataset.pmOutput}`);
+    });
+    for (const [name, value] of Object.entries(regression)) {
+      const actual = widget.querySelector(`[data-pm-output="${name}"]`)?.textContent.trim();
+      if (actual !== value) problems.push(`${widget.dataset.kind}: ${name} expected "${value}", got "${actual ?? 'missing'}"`);
+    }
+    return problems;
+  }));
+  for (const problem of widgetProblems) problems.push(`performance widget: ${problem}`);
   const deckContract = await page.$eval('.slides', (el) => ({
     min: Number(el.dataset.slideMin || 0),
     max: Number(el.dataset.slideMax || 0),
@@ -86,6 +132,10 @@ for (const deck of decks) {
     .map((link) => link.getAttribute('href') || '')
     .filter((href) => /css\/(?:topic|lecture)[-_]?\d/i.test(href)));
   for (const href of localLayoutSheets) problems.push(`template contract: lecture-specific layout stylesheet is forbidden — ${href}`);
+  const rawCodeBlocks = await page.$$eval('.slide pre', (blocks) => blocks
+    .filter((pre) => !pre.closest('.code-block, .code-runner'))
+    .map((pre) => (pre.textContent || '').trim().slice(0, 50)));
+  for (const sample of rawCodeBlocks) problems.push(`template contract: <pre> must use the shared .code-block/.code-runner component — "${sample}"`);
   for (let i = 1; i <= meta.length; i++) {
     const m = meta[i - 1];
     /* A stepped slide is several layouts sharing one URL. Audit every state:
