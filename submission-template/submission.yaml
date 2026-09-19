@@ -1,0 +1,5 @@
+# Filled in by you, read by the judge. Keep it true — it is printed on the public board.
+author: your-github-handle
+model: Qwen/Qwen2.5-3B-Instruct      # Hugging Face id of the weights you serve
+stack: vllm                          # vllm | sglang | llama.cpp | tensorrt-llm | custom
+notes: reference submission — plain vLLM defaults, FP16

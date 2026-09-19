@@ -1,52 +1,49 @@
-<section class="slide" data-type="arch" data-screen-label="21 Course map">
+<section class="slide" data-type="two-col" data-screen-label="21 Course map">
           <div class="slide-header">
             <h2><span lang="en">The course map</span></h2>
             <span class="slide-kicker"><span lang="en">Seven blocks, one kitchen growing up</span></span>
           </div>
-          <div class="arch-diagram">
-            <div class="arch-node" data-color="violet">
-              <div class="arch-icon">1–2</div>
-              <div class="arch-name"><span lang="en">Foundations</span></div>
-              <div class="arch-shape"><span lang="en">learn the stove</span></div>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:var(--sp-3); align-items:start;">
+            <div class="def-card" style="margin:0">
+              <span class="def-tag"><span lang="en">Topics 1–2</span></span>
+              <div class="def-term"><span lang="en">Foundations</span></div>
+              <div class="def-body"><p><span lang="en">learn the stove</span></p></div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="cyan">
-              <div class="arch-icon">3</div>
-              <div class="arch-name"><span lang="en">Optimization</span></div>
-              <div class="arch-shape"><span lang="en">smaller pans</span></div>
+            <div class="def-card" style="margin:0">
+              <span class="def-tag"><span lang="en">Topics 3</span></span>
+              <div class="def-term"><span lang="en">Optimization</span></div>
+              <div class="def-body"><p><span lang="en">smaller pans</span></p></div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node">
-              <div class="arch-icon">4–5</div>
-              <div class="arch-name"><span lang="en">vLLM Core</span></div>
-              <div class="arch-shape"><span lang="en">the big wok</span></div>
+            <div class="def-card" style="margin:0">
+              <span class="def-tag"><span lang="en">Topics 4–5</span></span>
+              <div class="def-term"><span lang="en">vLLM Core</span></div>
+              <div class="def-body"><p><span lang="en">the big wok</span></p></div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="red">
-              <div class="arch-icon">6–7</div>
-              <div class="arch-name"><span lang="en">High Concurrency</span></div>
-              <div class="arch-shape"><span lang="en">rush hour</span></div>
+            <div class="def-card" style="margin:0">
+              <span class="def-tag"><span lang="en">Topics 6–7</span></span>
+              <div class="def-term"><span lang="en">High Concurrency</span></div>
+              <div class="def-body"><p><span lang="en">rush hour</span></p></div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="amber">
-              <div class="arch-icon">8–9</div>
-              <div class="arch-name"><span lang="en">Production API</span></div>
-              <div class="arch-shape"><span lang="en">the pass</span></div>
+            <div class="def-card" style="margin:0">
+              <span class="def-tag"><span lang="en">Topics 8–9</span></span>
+              <div class="def-term"><span lang="en">Production API</span></div>
+              <div class="def-body"><p><span lang="en">the pass</span></p></div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="green">
-              <div class="arch-icon">10–12</div>
-              <div class="arch-name"><span lang="en">Infrastructure</span></div>
-              <div class="arch-shape"><span lang="en">more kitchens</span></div>
+            <div class="def-card" style="margin:0">
+              <span class="def-tag"><span lang="en">Topics 10–12</span></span>
+              <div class="def-term"><span lang="en">Infrastructure</span></div>
+              <div class="def-body"><p><span lang="en">more kitchens</span></p></div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="violet">
-              <div class="arch-icon">13–15</div>
-              <div class="arch-name"><span lang="en">LLMOps</span></div>
-              <div class="arch-shape"><span lang="en">run the restaurant</span></div>
+            <div class="def-card" style="margin:0">
+              <span class="def-tag"><span lang="en">Topics 13–15</span></span>
+              <div class="def-term"><span lang="en">LLMOps</span></div>
+              <div class="def-body"><p><span lang="en">run the restaurant</span></p></div>
+            </div>
+            <div class="callout" data-kind="info" style="margin:0">
+              <div class="callout-icon">i</div>
+              <div class="callout-body"><p><span lang="en">Topics, not weeks: the pace adapts to the group, the order does not.</span></p></div>
             </div>
           </div>
-          <p class="small muted mt-4 center"><span lang="en">Numbers are topics, not weeks. The pace adapts to the group; the order does not.</span></p>
           <aside class="slide-notes">Seven blocks. The first five happen on one GPU and feed the leaderboard directly. Infrastructure (multi-GPU, Kubernetes) and LLMOps are taught in lectures and seminars and tested on the exam — the judge has a single GPU, so they are not part of the leaderboard.</aside>
         </section>
 

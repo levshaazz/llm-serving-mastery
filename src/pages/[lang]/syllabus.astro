@@ -70,6 +70,10 @@ const blockTitle = Object.fromEntries(course.blocks.map((b) => [b.id, b.title]))
         {a.grades.map((g) => <span>{g.band} {g.range}</span>)}
       </p>
       <p><strong>{t(ui.labels.policy, lang)}:</strong> {t(a.policy, lang)}</p>
+      <h3>{t(ui.sections.leaderboard, lang)}</h3>
+      <ul class="reading">
+        {[course.leaderboard.deadline, course.leaderboard.marks, course.leaderboard.thresholds, course.leaderboard.overdrive, course.leaderboard.exemption].map((x) => <li>{t(x, lang)}</li>)}
+      </ul>
       <p><a href={localizedPath(lang, 'leaderboard')}>{t(ui.sections.leaderboard, lang)} →</a></p>
     </section>
 

@@ -17,3 +17,8 @@ seminars/*.json
 .ipynb_checkpoints/
 __pycache__/
 .DS_Store
+
+# judge: private roster, checked-out student code, local runs
+judge/roster.csv
+judge/rounds/
+runs/

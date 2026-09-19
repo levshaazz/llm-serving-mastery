@@ -1,0 +1,5 @@
+lm-eval[api,ifeval]==0.4.13
+guidellm==0.7.4
+datasets>=3
+transformers>=4.50
+pyyaml>=6

@@ -1,0 +1,63 @@
+{
+  "note": "Reconstructed from the printed output of the Colab run (the VM was lost before result.json could be downloaded); the full console output is in round-01.colab-run.log next to this file.",
+  "started_at": "2026-09-19T08:40:00+00:00",
+  "config_version": 2,
+  "ok": true,
+  "judge_error": false,
+  "steps": {
+    "contract": {
+      "ok": true,
+      "submission": {
+        "author": "your-github-handle",
+        "model": "Qwen/Qwen2.5-3B-Instruct",
+        "stack": "vllm",
+        "notes": "reference submission \u2014 plain vLLM defaults, FP16"
+      }
+    },
+    "gpu": {
+      "name": "Tesla T4",
+      "memory_total_mib": 15360,
+      "driver": "580.82.07"
+    },
+    "start": {
+      "mode": "serve.sh",
+      "ready_after_s": 130.1,
+      "root": "Qwen/Qwen2.5-3B-Instruct"
+    },
+    "quality": {
+      "gsm8k": 0.57,
+      "ifeval": 0.595,
+      "mmlu_pro": 0.45
+    },
+    "speed": {
+      "32": {
+        "output_tok_s": 372.89,
+        "ttft_p50_s": 1.9363,
+        "ttft_p95_s": 2.7999,
+        "tpot_p50_ms": 85.13,
+        "output_tokens_mean": 256.0,
+        "output_tokens_expected": 256,
+        "requests_ok": 282,
+        "requests_failed": 0,
+        "measured_s": 157.0
+      },
+      "64": {
+        "output_tok_s": 478.6,
+        "ttft_p50_s": 2.1753,
+        "ttft_p95_s": 2.9466,
+        "tpot_p50_ms": 131.43,
+        "output_tokens_mean": 256.0,
+        "output_tokens_expected": 256,
+        "requests_ok": 380,
+        "requests_failed": 0,
+        "measured_s": 146.1
+      }
+    },
+    "canary": {
+      "count": 16,
+      "similarity_mean": 0.941,
+      "similarity_min": 0.555,
+      "empty_under_load": 0
+    }
+  }
+}

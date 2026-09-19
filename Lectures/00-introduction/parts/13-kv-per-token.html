@@ -1,0 +1,26 @@
+<section class="slide" data-type="formula" data-screen-label="13 The KV cache per token">
+          <div class="slide-header" style="border:none; padding-bottom:0;">
+            <h2><span lang="en">The catch: counter space</span></h2>
+            <span class="slide-kicker"><span lang="en">Every live order keeps its KV cache in VRAM</span></span>
+          </div>
+          <div class="formula-stage">
+            $$ \text{KV per token} \;=\; 2 \times L \times H_{kv} \times d_h \times \text{bytes} $$
+          </div>
+          <div class="formula-caption">
+            <div class="var-block">
+              <div class="var-symbol">2</div>
+              <div class="var-desc"><span lang="en">a <strong>key</strong> and a <strong>value</strong><br />vector per head</span></div>
+            </div>
+            <div class="var-block">
+              <div class="var-symbol">\(L \cdot H_{kv} \cdot d_h\)</div>
+              <div class="var-desc"><span lang="en">layers × KV heads × head size:<br />\(36 \times 8 \times 128\) for a 4B-class model</span></div>
+            </div>
+            <div class="var-block">
+              <div class="var-symbol">= 144 KiB</div>
+              <div class="var-desc"><span lang="en">per token in FP16 (2 bytes) —<br />kept for <strong>every token of every live request</strong></span></div>
+            </div>
+          </div>
+          <aside class="slide-notes">The arithmetic: 2 (K and V) × 36 layers × 8 KV heads × 128 head dimension × 2 bytes = 147 456 bytes ≈ 144 KiB per token. A representative 4B-class configuration; your model's config.json gives its own L, H_kv and d_h. The KV cache grows with every prompt token and every generated token, for every request that is in flight. Next slide: what that means inside 16 GB.</aside>
+        </section>
+
+        <!-- ============================================ TWO-COL · the VRAM budget ============================================ -->

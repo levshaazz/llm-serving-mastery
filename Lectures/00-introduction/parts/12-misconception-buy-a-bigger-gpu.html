@@ -7,7 +7,7 @@
             <div class="misc-label"><span lang="en">What people think</span></div>
             <p class="misc-statement"><span lang="en">&ldquo;Our LLM is slow under load. We need a faster GPU.&rdquo;</span></p>
             <button class="misc-reveal-btn" type="button"><span lang="en">Reveal truth</span></button>
-            <div class="misc-truth"><span lang="en">Under load, a serial server is limited by <strong>scheduling and memory</strong>, not by FLOPs. A GPU twice as fast halves the 6.8-minute wait to 3.4 minutes. Serving all 64 orders <em>together</em> — continuous batching, a well-managed KV cache — turns minutes into seconds <strong>on the same GPU</strong>. That is the whole course in one sentence.</span></div>
+            <div class="misc-truth"><span lang="en">Under load, a serial server is limited by <strong>scheduling and memory</strong>, not by FLOPs. A GPU with twice the memory bandwidth halves the 6.8-minute wait to 3.4 minutes. Serving all 64 orders <em>together</em> — continuous batching, a well-managed KV cache — turns minutes into seconds <strong>on the same GPU</strong>. That is the whole course in one sentence.</span></div>
           </div>
           <aside class="slide-notes">Get the misconception out loud first — ask who would buy the bigger GPU. Then reveal. The rest of the course is the set of software moves that make the same hardware serve an order of magnitude more people.</aside>
         </section>

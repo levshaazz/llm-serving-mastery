@@ -8,9 +8,13 @@
     "dev": "astro dev",
     "build": "astro build && node scripts/assemble-deck.mjs build && node scripts/copy-static.mjs",
     "deck": "node scripts/assemble-deck.mjs build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "check": "node scripts/assemble-deck.mjs build && node scripts/check-deck.mjs && python3 judge/test_score.py && python3 scripts/sync_bars.py --check"
   },
   "dependencies": {
     "astro": "^5.6.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
   }
 }

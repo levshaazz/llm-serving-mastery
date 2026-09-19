@@ -16,6 +16,14 @@ levshaazz/deep-learning-for-search-summer-2026 (same deck engine, same mascot bi
   green tübetey, NEVER a chef's toque. Output → `_research/masters/` (gitignored), then
   `python3 scripts/optimize_images.py` → `Lectures/assets/img/**.webp`. Never optimize in place.
 - `seminars/00-live-demo-pipeline-vs-vllm.ipynb` — Lecture 0 live demo (Colab T4).
+- `judge/` — the leaderboard infrastructure (see judge/README.md): run_submission.py measures one
+  submission, score.py applies the rules, snapshot.py freezes tags at Thursday 23:59,
+  thresholds/round-NN.json are the published bars; judge/reference/ keeps the reference run they came from. The scoring rules exist in FOUR places — score.py,
+  data/course.json, the deck (slides 29–29c, 32) and the site — change them together.
+  GuideLLM (0.7.x) and lm-eval are pinned in judge/requirements.txt; their report schemas move between
+  versions, so a version bump means re-reading a real report (parse_guidellm).
+- `submission-template/` — the reference submission (round-1 bars were measured with it) and the
+  students' starting point. uv.lock is resolved for linux x86_64 only.
 - `.env` lives in the PARENT directory (outside the repo), never commit it.
 
 ## Language
@@ -23,5 +31,9 @@ EN only. Keep every deck string in `<span lang="en">` and every site string as `
 that is the RU migration path; don't write bare strings.
 
 ## Verify
-`npm run build` (4 pages) · `node scripts/assemble-deck.mjs check` · open the deck and check the
-pre-flight badge (bottom-right) shows 0 errors/warnings · LOOK at every slide (screenshots) before calling it done.
+`npm run check` = assemble decks + the deck gate (scripts/check-deck.mjs: text ≥ 18 px, display formulas
+≥ 36 px, inline ≥ 22 px at 1920×1080, auto-fit ≥ 0.75, pre-flight clean, no console errors, agenda
+anchors land on dividers, no horizontal clipping) + judge/test_score.py + scripts/sync_bars.py --check
+(slide 29b must show judge/thresholds/round-01.json). Then `npm run build` and LOOK at every slide.
+The gate is the floor, not the bar: a slide can pass it and still be bad.
+GPU work (vLLM, the judge, notebooks) runs on Colab through the colab CLI (see ../SKILL.md).

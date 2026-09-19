@@ -1,0 +1,101 @@
+[colab] Uploaded '/tmp/judge.tar.gz' to '/content/judge.tar.gz'
+
+{"ok": true, "judge_error": false}
+ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+{
+ "start": {
+  "mode": "serve.sh",
+  "ready_after_s": 130.1,
+  "root": "Qwen/Qwen2.5-3B-Instruct"
+ },
+ "quality": {
+  "gsm8k": 0.57,
+  "ifeval": 0.595,
+  "mmlu_pro": 0.45
+ },
+ "speed": {
+  "32": {
+   "output_tok_s": 372.89,
+   "ttft_p50_s": 1.9363,
+   "ttft_p95_s": 2.7999,
+   "tpot_p50_ms": 85.13,
+   "output_tokens_mean": 256.0,
+   "output_tokens_expected": 256,
+   "requests_ok": 282,
+   "requests_failed": 0,
+   "measured_s": 157.0
+  },
+  "64": {
+   "output_tok_s": 478.6,
+   "ttft_p50_s": 2.1753,
+   "ttft_p95_s": 2.9466,
+   "tpot_p50_ms": 131.43,
+   "output_tokens_mean": 256.0,
+   "output_tokens_expected": 256,
+   "requests_ok": 380,
+   "requests_failed": 0,
+   "measured_s": 146.1
+  }
+ },
+ "canary": {
+  "count": 16,
+  "similarity_mean": 0.941,
+  "similarity_min": 0.555,
+  "empty_under_load": 0
+ }
+}
+None None
+guidellm-c32.json
+guidellm-c32.log
+guidellm-c64.json
+guidellm-c64.log
+lm_eval
+lm_eval-gsm8k.log
+lm_eval-ifeval.log
+lm_eval-mmlu_pro.log
+result.json
+serve.log
+src
+== /content/runs/reference4/guidellm-c32.log
+
+
+✔ Benchmarking complete, generated 1 benchmark(s)
+…   json    : /content/runs/reference4/guidellm-c32.json
+== /content/runs/reference4/guidellm-c64.log
+
+
+✔ Benchmarking complete, generated 1 benchmark(s)
+…   json    : /content/runs/reference4/guidellm-c64.json
+== /content/runs/reference4/lm_eval-gsm8k.log
+|-----|------:|----------------|-----:|-----------|---|----:|---|-----:|
+|gsm8k|      3|flexible-extract|     5|exact_match|↑  |0.570|±  |0.0351|
+|     |       |strict-match    |     5|exact_match|↑  |0.005|±  |0.0050|
+
+== /content/runs/reference4/lm_eval-ifeval.log
+|      |       |none  |     0|inst_level_strict_acc  |↑  |0.6840|±  |   N/A|
+|      |       |none  |     0|prompt_level_loose_acc |↑  |0.6400|±  |0.0340|
+|      |       |none  |     0|prompt_level_strict_acc|↑  |0.5950|±  |0.0348|
+
+== /content/runs/reference4/lm_eval-mmlu_pro.log
+| Groups |Version|    Filter    |n-shot|  Metric   |   |Value|   |Stderr|
+|--------|------:|--------------|-----:|-----------|---|----:|---|-----:|
+|mmlu_pro|      2|custom-extract|     0|exact_match|↑  | 0.45|±  |0.0429|
+
+== /content/runs/reference4/serve.log
+(APIServer pid=16005) INFO:     Waiting for application shutdown.
+(APIServer pid=16005) INFO:     Application shutdown complete.
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+/content/runs/reference4/guidellm-c32.log:0
+/content/runs/reference4/guidellm-c64.log:0
+/content/runs/reference4/lm_eval-gsm8k.log:0
+/content/runs/reference4/lm_eval-ifeval.log:0
+/content/runs/reference4/lm_eval-mmlu_pro.log:0
+/content/runs/reference4/serve.log:0
+/content/runs/reference4/guidellm-c32.json:0
+/content/runs/reference4/guidellm-c64.json:0
+/content/runs/reference4/result.json:0
+
+
+[exited with code 0]

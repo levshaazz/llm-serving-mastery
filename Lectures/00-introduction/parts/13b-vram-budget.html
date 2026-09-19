@@ -1,0 +1,38 @@
+<section class="slide" data-type="two-col" data-screen-label="13b 16 GB, budgeted">
+          <div class="slide-header">
+            <h2><span lang="en">16 GB of VRAM, budgeted</span></h2>
+            <span class="slide-kicker"><span lang="en">Batching is free in bandwidth — not in memory</span></span>
+          </div>
+          <div class="twocol">
+            <div class="twocol-col">
+              <table class="cmp-table">
+                <tbody>
+                  <tr><td><span lang="en">Weights, 4B in BF16</span></td><td><strong>8 GB</strong></td></tr>
+                  <tr><td><span lang="en">Runtime, activations</span></td><td><strong>~2 GB</strong></td></tr>
+                  <tr><td><span lang="en">Left for the KV cache</span></td><td><strong>~6 GB</strong></td></tr>
+                  <tr><td><span lang="en">÷ 144 KiB per token</span></td><td><strong>≈ 40 000 tokens</strong></td></tr>
+                  <tr><td class="cell-bad"><span lang="en">÷ 64 guests</span></td><td class="cell-bad"><strong>≈ 630 tokens each</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="twocol-col">
+              <div class="callout" data-kind="warn">
+                <div class="callout-icon">!</div>
+                <div class="callout-body">
+                  <strong><span lang="en">630 tokens is prompt + answer</span></strong>
+                  <p><span lang="en">The leaderboard load is 64 × (512 + 256) ≈ 49 000 tokens. This setup does not fit it — the scheduler makes guests wait or evicts someone.</span></p>
+                </div>
+              </div>
+              <div class="callout" data-kind="info" style="margin-top:var(--sp-3)">
+                <div class="callout-icon">i</div>
+                <div class="callout-body">
+                  <strong><span lang="en">Every lever buys counter space</span></strong>
+                  <p><span lang="en">Quantized weights and KV cache, PagedAttention's no-waste allocation, prefix caching — topics 3, 5 and 7.</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="slide-notes">6·10⁹ / 147 456 ≈ 40 700 tokens in total, ≈ 636 per request at 64 concurrent requests — prompt plus answer. That is why the leaderboard rule is stated in tokens: 64 concurrent requests × (512 prompt + 256 answer) ≈ 49k tokens of KV cache next to the weights, in 16 GB. The 4B-in-BF16 example on this slide does not fit it — a first hint that quantization (topic 3) is not optional on the judge. The ~2 GB runtime figure is a rough allowance (CUDA context, activations, CUDA graphs), not a constant.</aside>
+        </section>
+
+        <!-- ============================================ ART-HERO · the big wok ============================================ -->

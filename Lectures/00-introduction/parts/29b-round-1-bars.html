@@ -1,0 +1,40 @@
+<section class="slide" data-type="two-col" data-screen-label="29b Round 1 bars">
+          <div class="slide-header">
+            <h2><span lang="en">Round 1 bars</span></h2>
+            <span class="slide-kicker"><span lang="en">Re-published every week, before the round opens</span></span>
+          </div>
+          <div class="twocol">
+            <div class="twocol-col">
+              <table class="cmp-table">
+                <thead><tr><th><span lang="en">Bar</span></th><th><span lang="en">Round 1</span></th></tr></thead>
+                <tbody>
+                  <tr><td>GSM8K</td><td>≥ 51.3%</td></tr>
+                  <tr><td>IFEval</td><td>≥ 53.5%</td></tr>
+                  <tr><td>MMLU-Pro</td><td>≥ 40.5%</td></tr>
+                  <tr><td><span lang="en">p95 TTFT at 64 clients</span></td><td>≤ 3.7 s</td></tr>
+                  <tr><td class="cell-good">\(S_{\text{bar}}\)</td><td class="cell-good"><strong>422.4 tok/s</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="twocol-col">
+              <div class="callout" data-kind="info">
+                <div class="callout-icon">i</div>
+                <div class="callout-body">
+                  <strong><span lang="en">Where they come from</span></strong>
+                  <p><span lang="en">The reference submission — Qwen2.5-3B-Instruct on plain vLLM — put through the judge on a <strong>Colab T4</strong>. Quality gates are 90% of its scores; the SLO is its p95 TTFT × 1.25.</span></p>
+                </div>
+              </div>
+              <div class="callout" data-kind="warn" style="margin-top:var(--sp-3)">
+                <div class="callout-icon">!</div>
+                <div class="callout-body">
+                  <strong><span lang="en">They move every week</span></strong>
+                  <p><span lang="en">Gates, \(S_{\text{bar}}\) and the SLO are updated and published on the leaderboard page before each round opens. Last week's 5 / 5 is not this week's.</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="slide-notes">Round 1 is deliberately reachable: the bar was measured on a T4, and the judge's RTX 5070 Ti has about 2.8× its memory bandwidth, so the reference submission should clear it there with room to spare. Getting a working, reproducible server through the contract is the real task of week 1. From round 2 the bars are re-set every week and published with the round; the source of each week's bars is written next to them on the leaderboard page. Numbers: judge/thresholds/round-01.json.</aside>
+        </section>
+
+        <!-- ============================================ -->
+        

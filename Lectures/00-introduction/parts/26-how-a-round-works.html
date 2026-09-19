@@ -1,48 +1,60 @@
-<section class="slide" data-type="arch" data-screen-label="26 How a round works">
+<section class="slide" data-type="walkthrough" data-max-step="6" data-current-step="0" data-screen-label="26 How a round works">
           <div class="slide-header">
             <h2><span lang="en">How a round works</span></h2>
-            <span class="slide-kicker"><span lang="en">Fully automatic — no manual steps on my side</span></span>
+            <span class="slide-kicker"><span lang="en">Fully automatic · step with →</span></span>
           </div>
-          <div class="arch-diagram">
-            <div class="arch-node" data-color="violet">
-              <div class="arch-icon">git</div>
-              <div class="arch-name"><span lang="en">Your repo</span></div>
-              <div class="arch-shape"><span lang="en">tag <code>round-NN</code></span></div>
+          <div class="walk-flow">
+            <div class="walk-step" data-step="1" data-color="violet">
+              <div class="walk-num">01</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">Thursday 23:59 — snapshot</span></div>
+                <div class="walk-detail"><span lang="en">The judge records the commit your <code>round-NN</code> tag points to. Moving the tag later changes nothing.</span></div>
+              </div>
+              <div class="walk-state">Thu 23:59</div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node">
-              <div class="arch-icon">⤓</div>
-              <div class="arch-name"><span lang="en">Clean checkout</span></div>
-              <div class="arch-shape"><span lang="en">on the judge</span></div>
+            <div class="walk-step" data-step="2" data-color="accent">
+              <div class="walk-num">02</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">Clean checkout</span></div>
+                <div class="walk-detail"><span lang="en">Exactly that commit, on the judge: 1 × RTX 5070 Ti, nothing left from other runs.</span></div>
+              </div>
+              <div class="walk-state">clean</div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="cyan">
-              <div class="arch-icon">:8000</div>
-              <div class="arch-name"><span lang="en"><code>serve.sh</code></span></div>
-              <div class="arch-shape"><span lang="en">OpenAI-compatible</span></div>
+            <div class="walk-step" data-step="3" data-color="cyan">
+              <div class="walk-num">03</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">Start</span></div>
+                <div class="walk-detail"><span lang="en"><code>serve.sh</code> (or your Dockerfile) must list <code>submission</code> on <code>/v1/models</code> within 30 min.</span></div>
+              </div>
+              <div class="walk-state">≤ 30 min</div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="amber">
-              <div class="arch-icon">✓</div>
-              <div class="arch-name"><span lang="en">Quality gate</span></div>
-              <div class="arch-shape">lm-eval</div>
+            <div class="walk-step" data-step="4" data-color="amber">
+              <div class="walk-num">04</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">Quality gate</span></div>
+                <div class="walk-detail"><span lang="en">lm-eval against your endpoint: GSM8K, IFEval, MMLU-Pro subsets.</span></div>
+              </div>
+              <div class="walk-state">≥ 90% ref</div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="red">
-              <div class="arch-icon">⏱</div>
-              <div class="arch-name"><span lang="en">Speed</span></div>
-              <div class="arch-shape">GuideLLM</div>
+            <div class="walk-step" data-step="5" data-color="red">
+              <div class="walk-num">05</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">Speed</span></div>
+                <div class="walk-detail"><span lang="en">GuideLLM at 32 and 64 concurrent clients, 512-token prompts → 256-token answers.</span></div>
+              </div>
+              <div class="walk-state">S · p95 TTFT</div>
             </div>
-            <div class="arch-arrow"></div>
-            <div class="arch-node" data-color="green">
-              <div class="arch-icon">#</div>
-              <div class="arch-name"><span lang="en">Public board</span></div>
-              <div class="arch-shape"><span lang="en">+ run logs</span></div>
+            <div class="walk-step" data-step="6" data-color="green" data-final="true">
+              <div class="walk-num">06</div>
+              <div class="walk-content">
+                <div class="walk-label"><span lang="en">Board</span></div>
+                <div class="walk-detail"><span lang="en">Mark, rank and Overdrive are published with the full logs of every step.</span></div>
+              </div>
+              <div class="walk-state">public</div>
             </div>
           </div>
-          <p class="small muted mt-4 center"><span lang="en">Judge: 1 × RTX 5070 Ti (Blackwell, 16 GB). Round deadlines: TBA.</span></p>
-          <aside class="slide-notes">The judge checks out exactly your tag in a clean environment, runs serve.sh, waits until /v1/models lists the model "submission", runs the quality gate, then the speed benchmark, and publishes results with the full logs. If your server does not come up, the log tells you why. A dry run every week lets you see your submission start on Blackwell before it counts.</aside>
+          <aside class="slide-notes">Step through it. The snapshot is what makes the deadline real: at Thursday 23:59 the judge resolves every student's round-NN tag to a commit SHA and measures exactly those commits — re-tagging after the deadline has no effect. Then a clean checkout, start-up (30-minute window: dependency install, weight download, engine start), a one-request smoke test, the quality gate, the speed runs, and publication with the full logs so that every failure is explainable. The same code runs in Colab: you can put your own repository through the identical pipeline before Thursday.</aside>
         </section>
 
-        <!-- ============================================ CODE · the contract ============================================ -->
+        <!-- ============================================ -->
         

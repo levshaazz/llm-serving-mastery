@@ -1,0 +1,56 @@
+# Judge configuration — the same for every submission in a round.
+# Changing anything here changes the measurement: bump `version` and say so in the round notes.
+version: 2
+
+budget_s: 5400                 # per submission, all steps; a round of 30 must finish well before the next deadline
+judge_hf_home: ~/.cache/lsm-judge-hf        # the judge's datasets and tokenizer — never mounted into a submission
+
+server:
+  port: 8000
+  model_name: submission
+  startup_timeout_s: 1800      # dependency install + weight download + engine start-up
+  shutdown_grace_s: 30
+  docker_build_timeout_s: 1800
+  gpu_idle_mib: 600            # "idle" = at most this much VRAM in use (the judge GPU is headless)
+  submission_hf_home: ~/.cache/lsm-submissions-hf
+  sandbox_image: ghcr.io/astral-sh/uv:python3.12-bookworm   # runs serve.sh with --sandbox docker
+  env_allowlist: [PATH, HOME, LANG, LC_ALL, TZ, LD_LIBRARY_PATH, CUDA_HOME, CUDA_PATH,     # libcuda lives on
+                  CUDA_VISIBLE_DEVICES, NVIDIA_VISIBLE_DEVICES, NVIDIA_DRIVER_CAPABILITIES,   # LD_LIBRARY_PATH on Colab
+                  UV_CACHE_DIR, UV_PYTHON_INSTALL_DIR, XDG_CACHE_HOME]
+
+contract:
+  required_files: [submission.yaml, JOURNAL.md]
+  serve_files: [serve.sh, pyproject.toml, uv.lock]   # required unless the repo has a Dockerfile
+  submission_yaml_keys: [author, model, stack]
+  # the server must accept requests of up to 4096 tokens (prompt + answer): quality prompts need it
+
+quality:                       # lm-eval against the running endpoint, on a secret seed-chosen subset
+  num_concurrent: 32
+  tasks:
+    gsm8k:    {n: 200, pool: 1319, metric: "exact_match,flexible-extract", timeout_s: 1800}
+    ifeval:   {n: 200, pool: 541,  metric: "prompt_level_strict_acc,none", timeout_s: 1800}
+    mmlu_pro: {n: 10,  pool: 300,  metric: "exact_match,custom-extract",   timeout_s: 2400,   # n per subject × 14
+               num_fewshot: 0, gen_kwargs: "max_gen_toks=1024"}   # 5-shot CoT + 2048 tokens does not fit 4096
+
+speed:                         # GuideLLM, one run per concurrency level
+  timeout_s: 1800
+  concurrency: [32, 64]
+  requests_per_level: 256      # measured in steady state; plus one wave (= concurrency) of warm-up and one of cool-down
+  prompt_tokens: 512           # in the judge tokenizer below; natural text, drawn with the secret seed
+  output_tokens: 256           # requested with max_completion_tokens + ignore_eos
+  tokenizer: Qwen/Qwen2.5-3B-Instruct
+  corpus: {path: Salesforce/wikitext, name: wikitext-103-raw-v1, split: test}
+  instruction: "Summarize the following text in detail."
+  extra_body: {temperature: 0}
+  canary_delay_s: 20           # canaries join the load after warm-up …
+  canary_spacing_s: 4          # … one every few seconds
+
+canary:
+  count: 16                    # half fired under load at each level; compared with the same prompts at rest
+
+scoring:                       # read by make_thresholds.py — the rules themselves live in score.py
+  quality_share: 0.90          # gate = 90% of the reference score
+  ttft_headroom: 1.25          # SLO = reference p95 TTFT@64 × 1.25 (rounded up to 0.1 s)
+  max_error_rate: 0.01
+  min_output_share: 0.95       # answers must really be output_tokens long
+  canary_min_similarity: 0.5   # same prompt at rest vs under load — the same model must answer both

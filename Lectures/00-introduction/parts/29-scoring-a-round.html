@@ -1,22 +1,23 @@
 <section class="slide" data-type="table" data-screen-label="29 Scoring a round">
           <div class="slide-header">
             <h2><span lang="en">How a round is scored</span></h2>
-            <span class="slide-kicker"><span lang="en">Quality is a gate, speed is the race</span></span>
+            <span class="slide-kicker"><span lang="en">Gates first, then one number: S</span></span>
           </div>
           <table class="cmp-table">
             <thead>
               <tr><th><span lang="en">Step</span></th><th><span lang="en">Rule</span></th></tr>
             </thead>
             <tbody>
-              <tr><td><span lang="en">Contract</span></td><td><span lang="en">Server comes up and lists <code>submission</code> within the start-up window (TBA) — else the round is 0.</span></td></tr>
-              <tr><td><span lang="en">Quality gate</span></td><td><span lang="en">Subset of GSM8K, MMLU-Pro and IFEval via lm-eval ≥ the gate (TBA) — else the round is 0.</span></td></tr>
-              <tr><td><span lang="en">Speed</span></td><td><span lang="en">Output tok/s at concurrency 32 and 64 + p95 TTFT, GuideLLM on a fixed hidden prompt set → rank.</span></td></tr>
-              <tr><td class="cell-good"><span lang="en">Mark 0–5</span></td><td><span lang="en">Clear the round's speed bar → <strong>5 / 5</strong>. The bar rises every round (baseline + x%, TBA).</span></td></tr>
-              <tr><td class="cell-good"><span lang="en">Overdrive</span></td><td><span lang="en">Top 10% of the round <strong>+2</strong>, next 10% <strong>+1</strong>.</span></td></tr>
-              <tr><td class="cell-good"><span lang="en">Exam waiver</span></td><td><span lang="en">Overdrive ≥ N (TBA) after round 10 → final exam waived, credited at <strong>40 / 50</strong>.</span></td></tr>
+              <tr><td><span lang="en">Snapshot</span></td><td><span lang="en">Thursday 23:59: the commit your <code>round-NN</code> tag points to. No tag → 0.</span></td></tr>
+              <tr><td><span lang="en">Contract</span></td><td><span lang="en">Server starts and lists <code>submission</code> within 30 min; a streamed smoke answer works.</span></td></tr>
+              <tr><td><span lang="en">Quality gate</span></td><td><span lang="en">GSM8K, IFEval, MMLU-Pro subsets (lm-eval): each ≥ 90% of the reference.</span></td></tr>
+              <tr><td><span lang="en">Latency gate</span></td><td><span lang="en">p95 TTFT at 64 clients ≤ the round's SLO; errors ≤ 1%; answers really 256 tokens.</span></td></tr>
+              <tr><td><span lang="en">Same model</span></td><td><span lang="en">Hidden canary prompts, answered at rest and again under load, must match.</span></td></tr>
+              <tr><td><span lang="en">Speed</span></td><td><span lang="en">\(S = \sqrt{\text{tok/s}_{32} \cdot \text{tok/s}_{64}}\)</span></td></tr>
+              <tr><td><span lang="en">Mark 0–5</span></td><td><span lang="en">\(5 \times \min(1,\ S / S_{\text{bar}})\); any failed gate → 0. <strong>Round = 4%</strong>: points = mark × 0.8.</span></td></tr>
             </tbody>
           </table>
-          <aside class="slide-notes">Read it top to bottom. A server that does not start, or that got fast by getting dumb, scores zero for the round — the quality gate stops quantizing a model into nonsense. Among valid submissions, speed decides. The bar that gives a full 5 rises round by round, so standing still is not enough. Overdrive rewards those who are consistently at the top: it does not raise your 40% above 40, it buys the right to skip the final exam. Exact bars, the gate thresholds, N and the partial-credit formula are published with the leaderboard spec.</aside>
+          <aside class="slide-notes">Top to bottom, every round. The snapshot makes the deadline real. A server that does not start, or that got fast by getting dumb, scores zero — the quality gate stops quantizing a model into nonsense, the latency gate stops buying throughput with a 30-second first token, the output-length check stops servers that ignore max_tokens / ignore_eos. Among valid submissions only S matters: the geometric mean of throughput at 32 and 64 clients, so you cannot win on one level and collapse on the other. The mark is proportional: half the bar = 2.5 of 5. Each round is worth 4% of the course grade (mark × 0.8); ten rounds = 40%.</aside>
         </section>
 
         <!-- ============================================ TWO-COL · the defense ============================================ -->

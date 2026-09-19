@@ -1,0 +1,53 @@
+{
+  "round": 1,
+  "note": "Reference submission (Qwen2.5-3B-Instruct, vLLM 0.29, FP16) on Colab T4, 2026-09-19",
+  "reference": {
+    "gpu": "Tesla T4",
+    "submission": {
+      "author": "your-github-handle",
+      "model": "Qwen/Qwen2.5-3B-Instruct",
+      "stack": "vllm",
+      "notes": "reference submission \u2014 plain vLLM defaults, FP16"
+    },
+    "quality": {
+      "gsm8k": 0.57,
+      "ifeval": 0.595,
+      "mmlu_pro": 0.45
+    },
+    "speed": {
+      "32": {
+        "output_tok_s": 372.89,
+        "ttft_p50_s": 1.9363,
+        "ttft_p95_s": 2.7999,
+        "tpot_p50_ms": 85.13,
+        "output_tokens_mean": 256.0,
+        "output_tokens_expected": 256,
+        "requests_ok": 282,
+        "requests_failed": 0,
+        "measured_s": 157.0
+      },
+      "64": {
+        "output_tok_s": 478.6,
+        "ttft_p50_s": 2.1753,
+        "ttft_p95_s": 2.9466,
+        "tpot_p50_ms": 131.43,
+        "output_tokens_mean": 256.0,
+        "output_tokens_expected": 256,
+        "requests_ok": 380,
+        "requests_failed": 0,
+        "measured_s": 146.1
+      }
+    },
+    "measured_at": "2026-09-19T08:40:00+00:00"
+  },
+  "quality_gates": {
+    "gsm8k": 0.513,
+    "ifeval": 0.5355,
+    "mmlu_pro": 0.405
+  },
+  "speed_bar_S": 422.4,
+  "ttft_p95_slo_s": 3.7,
+  "max_error_rate": 0.01,
+  "min_output_share": 0.95,
+  "canary_min_similarity": 0.5
+}

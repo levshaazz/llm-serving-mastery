@@ -1,6 +1,6 @@
 <section class="slide" data-type="walkthrough" data-max-step="4" data-current-step="0" data-screen-label="10 The queue">
           <div class="slide-header">
-            <h2><span lang="en">What the 64th guest experiences</span></h2>
+            <h2><span lang="en">When the k-th guest gets the answer</span></h2>
             <span class="slide-kicker"><span lang="en">Back-of-the-envelope · step with →</span></span>
           </div>
           <p class="small muted mt-2"><span lang="en">Assume one answer = 256 output tokens, and the naive server generates 40 tokens/s for a single request → <span class="term">6.4 s</span> per order. Orders are served strictly one after another.</span></p>
@@ -17,7 +17,7 @@
               <div class="walk-num">02</div>
               <div class="walk-content">
                 <div class="walk-label"><span lang="en">8 clients</span></div>
-                <div class="walk-detail"><span lang="en">The 8th waits for 7 orders before its own: \(8 \times 6.4\) s.</span></div>
+                <div class="walk-detail"><span lang="en">Seven orders are cooked before it, then its own: \(8 \times 6.4\) s.</span></div>
               </div>
               <div class="walk-state">51 s</div>
             </div>
