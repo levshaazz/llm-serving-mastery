@@ -150,6 +150,18 @@ JOBS = [
      "THE SEND-OFF. Serega throws open the double doors of the kitchen onto a full, cheerful dining "
      "room, one hand raising a ladle like a salute, apron on. A slim ribbon above the doors reads "
      "'kitchen is open'. Warm, earned, optimistic."),
+    ("L01", "L01/L01-01-rush-hour.png", "16:9", True,
+     "THE 09:00 INCIDENT. Serega stands at one GPU stove while a wall of order tickets and a long "
+     "queue arrive together. One request worked; the production load changed the system. No labels, "
+     "no plants, and no food garnish. The green tübetey is the ONLY green object."),
+    ("L01", "L01/L01-02-retry-storm.png", "16:9", True,
+     "THE RETRY STORM. Serega closes an admission valve while late order tickets loop back, duplicate, "
+     "and overflow a bounded conveyor queue. Background workers are bare-headed. Food icons use only "
+     "course blue, warm orange, black ink, and off-white. The green tübetey is the ONLY green object."),
+    ("L01", "L01/L01-03-stable-system.png", "16:9", True,
+     "CONTROLLED FLOW. Serega calmly supervises a bounded queue feeding three coordinated GPU stoves; "
+     "simple chart shapes show stable observable operation. The left third remains open for slide copy. "
+     "No labels or plants. The green tübetey is the ONLY green object."),
 ]
 
 H = {"Authorization": f"Bearer {API_KEY}"}

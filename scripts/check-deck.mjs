@@ -58,7 +58,7 @@ for (const deck of decks) {
   const structuralProblems = await page.$$eval('.slide', (slides) => {
     const required = {
       title: ['.title-header', '.title-body', '.title-footer'],
-      agenda: ['.agenda-grid'],
+      agenda: ['.agenda-grid', '.agenda-grid .toc-item', '.toc-item .toc-num', '.toc-item .toc-text', '.toc-item .toc-title', '.toc-item .toc-sub'],
       objectives: ['.obj-list'],
       divider: ['.divider-content'],
       formula: ['.formula-stage', '.formula-caption'],
@@ -68,17 +68,34 @@ for (const deck of decks) {
       final: ['.final-body'],
       table: ['.cmp-table'],
       walkthrough: ['.walk-flow'],
+      archflow: ['.af-stage', '.af-canvas', '.af-panel', '.af-note[data-step="0"]', '.af-node[data-from="0"]'],
+      sequence: ['.seq-stage', '.seq-canvas', '.seq-actors', '.seq-msgs', '.seq-budget'],
     };
     return slides.flatMap((slide, index) => (required[slide.dataset.type] || [])
       .filter((selector) => !slide.querySelector(selector))
       .map((selector) => `${String(index + 1).padStart(2, '0')} ${slide.dataset.screenLabel}: template structure missing ${selector}`));
   });
   problems.push(...structuralProblems);
+  const deckContract = await page.$eval('.slides', (el) => ({
+    min: Number(el.dataset.slideMin || 0),
+    max: Number(el.dataset.slideMax || 0),
+  }));
+  if (deckContract.min && meta.length < deckContract.min) problems.push(`deck contract: ${meta.length} slides < declared minimum ${deckContract.min}`);
+  if (deckContract.max && meta.length > deckContract.max) problems.push(`deck contract: ${meta.length} slides > declared maximum ${deckContract.max}`);
+  const localLayoutSheets = await page.$$eval('link[rel="stylesheet"]', (links) => links
+    .map((link) => link.getAttribute('href') || '')
+    .filter((href) => /css\/(?:topic|lecture)[-_]?\d/i.test(href)));
+  for (const href of localLayoutSheets) problems.push(`template contract: lecture-specific layout stylesheet is forbidden — ${href}`);
   for (let i = 1; i <= meta.length; i++) {
     const m = meta[i - 1];
-    await page.evaluate((h) => { location.hash = h; }, m.steps ? `#/${i}/${m.steps}` : `#/${i}`);
-    await page.waitForTimeout(450);
-    const r = await page.evaluate(({ EXEMPT, DISPLAY_MATH_FLOOR, INLINE_MATH_FLOOR }) => {
+    /* A stepped slide is several layouts sharing one URL. Audit every state:
+       checking only the final reveal missed blank/overlapping intermediate
+       states in Lecture 1's first archflow. */
+    const states = m.steps ? Array.from({ length: m.steps + 1 }, (_, step) => step) : [null];
+    for (const step of states) {
+      await page.evaluate((h) => { location.hash = h; }, step == null ? `#/${i}` : `#/${i}/${step}`);
+      await page.waitForTimeout(450);
+      const r = await page.evaluate(({ EXEMPT, DISPLAY_MATH_FLOOR, INLINE_MATH_FLOOR }) => {
       const slide = document.querySelector('.slide.is-active, .slide.active, .slide[aria-hidden="false"]') ||
         [...document.querySelectorAll('.slide')].find((s) => s.getBoundingClientRect().width > 0 && getComputedStyle(s).visibility !== 'hidden' && getComputedStyle(s).display !== 'none');
       if (!slide) return { err: 'no active slide' };
@@ -107,17 +124,38 @@ for (const deck of decks) {
         .map((el) => el.textContent.trim().slice(0, 40));
       return { minText, minMath, fit, clipped };
     }, { EXEMPT, DISPLAY_MATH_FLOOR, INLINE_MATH_FLOOR });
-    const tag = `${String(i).padStart(2, '0')} ${m.label}`;
-    if (r.err) { problems.push(`${tag}: ${r.err}`); continue; }
-    if (report) console.log(`${tag.padEnd(44)} text ${r.minText.px < 1e9 ? r.minText.px.toFixed(1) : '—'}  math ${r.minMath.px < 1e9 ? r.minMath.px.toFixed(1) : '—'}  fit ${r.fit.toFixed(2)}`);
-    if (r.minText.px < TEXT_FLOOR) problems.push(`${tag}: text ${r.minText.px.toFixed(1)} px < ${TEXT_FLOOR} — "${r.minText.text}"`);
-    if (r.minMath.px < r.minMath.floor) problems.push(`${tag}: ${r.minMath.display ? 'display' : 'inline'} formula ${r.minMath.px.toFixed(1)} px < ${r.minMath.floor} — ${r.minMath.text}`);
-    for (const c of r.clipped) problems.push(`${tag}: content cut off horizontally — "${c}"`);
-    if (r.fit < FIT_FLOOR) problems.push(`${tag}: auto-fit ${r.fit.toFixed(2)} < ${FIT_FLOOR} — split the slide`);
+      const tag = `${String(i).padStart(2, '0')} ${m.label}${step == null ? '' : ` [step ${step}/${m.steps}]`}`;
+      if (r.err) { problems.push(`${tag}: ${r.err}`); continue; }
+      if (report) console.log(`${tag.padEnd(44)} text ${r.minText.px < 1e9 ? r.minText.px.toFixed(1) : '—'}  math ${r.minMath.px < 1e9 ? r.minMath.px.toFixed(1) : '—'}  fit ${r.fit.toFixed(2)}`);
+      if (r.minText.px < TEXT_FLOOR) problems.push(`${tag}: text ${r.minText.px.toFixed(1)} px < ${TEXT_FLOOR} — "${r.minText.text}"`);
+      if (r.minMath.px < r.minMath.floor) problems.push(`${tag}: ${r.minMath.display ? 'display' : 'inline'} formula ${r.minMath.px.toFixed(1)} px < ${r.minMath.floor} — ${r.minMath.text}`);
+      for (const c of r.clipped) problems.push(`${tag}: content cut off horizontally — "${c}"`);
+      if (r.fit < FIT_FLOOR) problems.push(`${tag}: auto-fit ${r.fit.toFixed(2)} < ${FIT_FLOOR} — split the slide`);
+    }
   }
   // G4 preflight
   const pf = await page.evaluate(() => { try { return window.__preflight ? window.__preflight.runChecks() : []; } catch (e) { return [{ msg: String(e) }]; } });
   for (const x of pf || []) problems.push(`preflight: ${x.slide || ''} ${x.msg}`);
+  // G4b theme contract — changing only data-theme is insufficient because
+  // tweak preferences may leave light inline background tokens behind. Use
+  // the same event as the toolbar and fail if the resolved dark palette is not dark.
+  await page.evaluate(() => {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.dispatchEvent(new CustomEvent('lecture:themechanged'));
+  });
+  await page.waitForTimeout(100);
+  const darkTokens = await page.evaluate(() => {
+    const cs = getComputedStyle(document.documentElement);
+    const rgb = (name) => {
+      const probe = document.createElement('span');
+      probe.style.color = `var(${name})`; document.body.appendChild(probe);
+      const value = getComputedStyle(probe).color; probe.remove();
+      return (value.match(/[\d.]+/g) || ['255','255','255']).slice(0, 3).map(Number);
+    };
+    const lum = ([r,g,b]) => (0.2126*r + 0.7152*g + 0.0722*b) / 255;
+    return { bg: cs.getPropertyValue('--bg').trim(), bgLum: lum(rgb('--bg')), inkLum: lum(rgb('--ink')) };
+  });
+  if (darkTokens.bgLum > 0.25 || darkTokens.inkLum < 0.65) problems.push(`theme contract: dark palette did not resolve (bg ${darkTokens.bg}, luminance ${darkTokens.bgLum.toFixed(2)}, ink ${darkTokens.inkLum.toFixed(2)})`);
   // G5 console
   for (const e of errors) problems.push(`console: ${e}`);
   // G6 agenda anchors

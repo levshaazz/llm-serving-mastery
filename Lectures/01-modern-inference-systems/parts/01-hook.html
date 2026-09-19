@@ -1,0 +1,59 @@
+<section class="slide" data-type="title" data-screen-label="01 Title">
+  <div class="title-header"><div class="course-tag">LLM SERVING MASTERY</div><div data-logo-slot></div></div>
+  <div class="title-body"><div class="eyebrow"><span lang="en">Lecture 1 · Foundations</span></div><h1><span lang="en">Modern LLM<br />inference systems</span></h1><p class="subtitle"><span lang="en">Why one correct generation becomes a queueing, lifecycle, and reliability problem in production.</span></p></div>
+  <div class="title-footer"><div><div class="meta-label">Lecturer</div><div class="meta-value">Albert Nasybullin</div></div><div><div class="meta-label">Depth</div><div class="meta-value">System boundary → measurement contract</div></div></div>
+  <aside class="slide-notes">Today we turn “the model answered” into “the service kept a measurable promise under load.”</aside>
+</section>
+
+<section class="slide" data-type="art-hero" data-screen-label="02 The 09:00 incident">
+  <div class="art-hero"><div class="art-hero__kicker"><span lang="en">09:00 · one request was perfect</span></div><figure class="art-hero__fig"><img src="assets/img/L01/L01-01-rush-hour.webp?v=1" alt="Serega at one GPU stove while a production queue and request tickets flood the kitchen" /></figure><p class="art-hero__cap"><span lang="en">At 08:59 the demo passed. At 09:00 sixty-four clients arrived—and the system began completing work nobody still wanted.</span></p></div>
+  <aside class="slide-notes">Ask what changed. The weights did not. The workload, concurrency, deadlines, and failure feedback did.</aside>
+</section>
+
+<section class="slide" data-type="agenda" data-screen-label="03 Agenda">
+  <div class="slide-header"><h2><span lang="en">One request → one production system</span></h2><span class="slide-kicker"><span lang="en">Seven decisions</span></span></div>
+  <div class="agenda-grid">
+    <a class="toc-item" href="#/9"><span class="toc-num">01</span><span class="toc-text"><span class="toc-title"><span lang="en">Draw the boundary</span></span><span class="toc-sub"><span lang="en">request path and ownership</span></span></span></a>
+    <a class="toc-item" href="#/23"><span class="toc-num">02</span><span class="toc-text"><span class="toc-title"><span lang="en">Account for time</span></span><span class="toc-sub"><span lang="en">TTFT, decode, E2E, goodput</span></span></span></a>
+    <a class="toc-item" href="#/39"><span class="toc-num">03</span><span class="toc-text"><span class="toc-title"><span lang="en">Specify load</span></span><span class="toc-sub"><span lang="en">arrivals, lengths, saturation</span></span></span></a>
+    <a class="toc-item" href="#/56"><span class="toc-num">04</span><span class="toc-text"><span class="toc-title"><span lang="en">Control failure loops</span></span><span class="toc-sub"><span lang="en">queues, deadlines, retries</span></span></span></a>
+    <a class="toc-item" href="#/70"><span class="toc-num">05</span><span class="toc-text"><span class="toc-title"><span lang="en">Choose an architecture</span></span><span class="toc-sub"><span lang="en">state, routing, lifecycle</span></span></span></a>
+    <a class="toc-item" href="#/82"><span class="toc-num">06</span><span class="toc-text"><span class="toc-title"><span lang="en">Measure, then decide</span></span><span class="toc-sub"><span lang="en">experiment contract and evidence</span></span></span></a>
+  </div>
+<aside class="slide-notes">Teaching note for 03 Agenda: make the claim concrete in the running 09:00 incident, ask which observable event would confirm it, and name the simplifying assumption before moving on.</aside></section>
+
+<section class="slide" data-type="objectives" data-screen-label="04 Outcomes">
+  <div class="slide-header"><h2><span lang="en">By the end, you can diagnose—not guess</span></h2><span class="slide-kicker"><span lang="en">Observable outcomes</span></span></div>
+  <div class="obj-list">
+    <div class="obj-item"><span class="obj-check">01</span><div class="obj-text"><strong><span lang="en">Trace</span></strong><span lang="en"> a request from arrival to final byte and name every waiting boundary.</span></div></div>
+    <div class="obj-item"><span class="obj-check">02</span><div class="obj-text"><strong><span lang="en">Compute</span></strong><span lang="en"> TTFT, decode time, goodput, concurrency, and retry amplification from raw events.</span></div></div>
+    <div class="obj-item"><span class="obj-check">03</span><div class="obj-text"><strong><span lang="en">Separate</span></strong><span lang="en"> demand, capacity, useful completions, attempts, and failures.</span></div></div>
+    <div class="obj-item"><span class="obj-check">04</span><div class="obj-text"><strong><span lang="en">Write</span></strong><span lang="en"> a reproducible workload/SLO/measurement contract before tuning an engine.</span></div></div>
+  </div>
+<aside class="slide-notes">Teaching note for 04 Outcomes: make the claim concrete in the running 09:00 incident, ask which observable event would confirm it, and name the simplifying assumption before moving on.</aside></section>
+
+<section class="slide" data-type="two-col" data-screen-label="05 Incident timeline">
+  <div class="slide-header"><h2><span lang="en">The incident did not begin at the GPU</span></h2><span class="slide-kicker"><span lang="en">A plausible trace</span></span></div>
+  <div class="twocol"><div class="twocol-col"><h3><span lang="en">What operators saw</span></h3><ul><li><span lang="en">TTFT p99 jumped from 0.7 s to 18 s.</span></li><li><span lang="en">GPU utilization stayed high.</span></li><li><span lang="en">Request attempts rose after timeouts.</span></li><li><span lang="en">Completed tokens increased; useful answers fell.</span></li></ul></div><div class="twocol-col"><h3><span lang="en">What actually changed</span></h3><ul><li><span lang="en">Arrival rate crossed sustainable admission rate.</span></li><li><span lang="en">Queue residence consumed the deadline.</span></li><li><span lang="en">Clients retried stale work.</span></li><li><span lang="en">Cancellation did not reach the scheduler.</span></li></ul></div></div>
+  <aside class="slide-notes">These are illustrative incident numbers. The diagnostic structure, not the values, is the lesson.</aside>
+</section>
+
+<section class="slide" data-type="definition" data-screen-label="06 Serving promise">
+  <div class="slide-header"><h2><span lang="en">Serving is a promise with a workload attached</span></h2><span class="slide-kicker"><span lang="en">Working definition</span></span></div>
+  <div class="def-card"><div class="def-tag">SYSTEM CONTRACT</div><div class="def-term"><span lang="en">A serving system accepts demand, schedules stateful generation, streams results, and sheds work so that declared quality, latency, throughput, cost, and availability objectives hold for a declared workload.</span></div><div class="def-body"><p><span lang="en">Remove the workload and the promise is unfalsifiable. Remove failure policy and the promise fails exactly when it matters.</span></p></div></div>
+<aside class="slide-notes">Teaching note for 06 Serving promise: make the claim concrete in the running 09:00 incident, ask which observable event would confirm it, and name the simplifying assumption before moving on.</aside></section>
+
+<section class="slide" data-type="table" data-screen-label="07 Four questions">
+  <div class="slide-header"><h2><span lang="en">Four questions before any optimization</span></h2><span class="slide-kicker"><span lang="en">The diagnostic frame</span></span></div>
+  <table class="cmp-table"><thead><tr><th><span lang="en">Question</span></th><th><span lang="en">Evidence</span></th><th><span lang="en">Typical mistake</span></th></tr></thead><tbody>
+    <tr><td><strong><span lang="en">Where?</span></strong></td><td><span lang="en">trace and component boundary</span></td><td><span lang="en">blame “the model”</span></td></tr>
+    <tr><td><strong><span lang="en">When?</span></strong></td><td><span lang="en">queue/prefill/decode timestamps</span></td><td><span lang="en">report one latency</span></td></tr>
+    <tr><td><strong><span lang="en">Under what load?</span></strong></td><td><span lang="en">arrival process + token distributions</span></td><td><span lang="en">say “concurrency 32”</span></td></tr>
+    <tr><td><strong><span lang="en">What happens on failure?</span></strong></td><td><span lang="en">deadline, cancel, retry, admission policy</span></td><td><span lang="en">let queues grow</span></td></tr>
+  </tbody></table>
+<aside class="slide-notes">Teaching note for 07 Four questions: make the claim concrete in the running 09:00 incident, ask which observable event would confirm it, and name the simplifying assumption before moving on.</aside></section>
+
+<section class="slide" data-type="quote" data-screen-label="08 Thesis">
+  <div class="quote-mark">“</div><blockquote><span lang="en">The model call is a stage. The product is the controlled flow around it.</span></blockquote><div class="quote-attr"><span lang="en">Lecture thesis</span></div>
+  <aside class="slide-notes">The rest of the lecture earns this sentence with components, equations, and failure cases.</aside>
+</section>

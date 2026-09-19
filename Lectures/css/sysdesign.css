@@ -89,7 +89,7 @@
 }
 .seq-msg .seq-lat {
   position: absolute; top: 4px; right: 0; font-family: var(--font-mono);
-  font-size: var(--fs-label-xs); color: var(--c-amber-ink, #8A5A00);
+  font-size: 20px; color: var(--c-amber-ink, #8A5A00);
 }
 .seq-msg.is-step-hidden, .funnel-stage.is-step-hidden { /* uses global ghost (opacity .08) */ }
 

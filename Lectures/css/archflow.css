@@ -284,7 +284,10 @@
 @keyframes afNoteIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .af-note .af-note-head {
   font-family: var(--font-mono);
-  font-size: var(--fs-label-xs);
+  /* Guardrail: archflow is commonly auto-fitted because its stage combines a
+     fixed-aspect canvas and a side panel. Keep panel headings above the deck's
+     18 px rendered floor even at the supported 0.75 fit floor. */
+  font-size: 24px;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--accent-ink);

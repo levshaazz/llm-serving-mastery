@@ -1,8 +1,0 @@
-<section class="slide" data-type="two-col" data-screen-label="06 Offline vs online">
-  <div class="slide-header"><h2><span lang="en">Offline inference and online serving optimize different objectives</span></h2><span class="slide-kicker"><span lang="en">Modes</span></span></div>
-  <div class="twocol">
-    <div class="twocol-col panel"><h3><span lang="en">Offline / batch</span></h3><ul><li><span lang="en">Finite known dataset</span></li><li><span lang="en">Throughput and total cost dominate</span></li><li><span lang="en">Delay can be amortized</span></li><li><span lang="en">Failures can often be retried later</span></li></ul></div>
-    <div class="twocol-col panel"><h3><span lang="en">Online / interactive</span></h3><ul><li><span lang="en">Arrivals are uncertain</span></li><li><span lang="en">TTFT and tail latency matter</span></li><li><span lang="en">Users cancel and retry</span></li><li><span lang="en">Overload must be controlled now</span></li></ul></div>
-  </div>
-  <aside class="slide-notes">The same engine can support both modes, but a benchmark must say which problem it models. Throughput-only conclusions from an offline batch are not evidence for an interactive SLO.</aside>
-</section>

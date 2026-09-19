@@ -1,9 +1,0 @@
-<section class="slide" data-type="two-col" data-screen-label="25 Planes">
-  <div class="slide-header"><h2><span lang="en">Data plane and control plane fail differently</span></h2><span class="slide-kicker"><span lang="en">Operational boundary</span></span></div>
-  <div class="twocol">
-    <div class="twocol-col panel"><h3><span lang="en">Data plane</span></h3><p><span lang="en">Carries live inference requests, tokens and cancellations. Its SLO is user-facing.</span></p></div>
-    <div class="twocol-col panel"><h3><span lang="en">Control plane</span></h3><p><span lang="en">Configures models, replicas, rollouts, placement and policy. Its mistakes change the data plane.</span></p></div>
-  </div>
-  <p class="lead"><span lang="en">A healthy control API does not prove that generation works; a working replica does not prove that rollout policy is safe.</span></p>
-  <aside class="slide-notes">This prepares students for Kubernetes and model deployment later without teaching infrastructure prematurely. Ask for separate readiness checks for each plane.</aside>
-</section>

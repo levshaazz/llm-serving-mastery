@@ -3,6 +3,19 @@
 Course site (Astro) + offline lecture decks + Colab seminars. Sister course and template origin:
 levshaazz/deep-learning-for-search-summer-2026 (same deck engine, same mascot bible).
 
+## Lecture authoring contract (mandatory)
+Read `narrative/LECTURE_STANDARD.md` before authoring or revising any lecture. In short:
+- Start from a narrative beat sheet; a full lecture targets 80–100 slides unless the owner explicitly
+  sets another size. Depth, worked examples, and evidence are part of the deliverable—not optional polish.
+- Use the canonical deck shell and native slide components already demonstrated by Lecture 0. Do not
+  create lecture-specific layout CSS or ad-hoc replacements for native components. A genuinely missing
+  pattern must become a reusable, documented template component with a fixture and a gate.
+- Generate narrative/mascot artwork with the image-generation workflow and the locked mascot bible.
+- Treat every discovered layout failure as a missing guardrail: first preserve a minimal reproduction,
+  then fix the layout, then add or extend an automated check so the same defect cannot silently return.
+- `npm run check` is only the mechanical floor. The author must render and inspect every slide at the
+  target viewport in light and dark themes and verify every interactive state.
+
 ## Where things live
 - `data/course.json` — THE source of course facts: topics (no weeks — topics only, by owner's decision),
   assessment (exam 50 / leaderboard 40 / defense 10), leaderboard rules, reading. Pages read it; the
