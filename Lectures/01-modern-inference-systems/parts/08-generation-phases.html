@@ -1,9 +1,8 @@
 <section class="slide" data-type="process" data-screen-label="08 Generation phases">
   <div class="slide-header"><h2><span lang="en">Generation has two computationally different phases</span></h2><span class="slide-kicker"><span lang="en">Prefill / decode</span></span></div>
-  <div class="two-col">
-    <div class="panel accent"><h3><span lang="en">Prefill</span></h3><p><span lang="en">Process the prompt in parallel, build state for all prompt tokens, produce the first next-token distribution.</span></p><p><strong><span lang="en">Grows with input length.</span></strong></p></div>
-    <div class="panel"><h3><span lang="en">Decode</span></h3><p><span lang="en">Generate one new token per sequence step, reusing cached state and repeatedly reading model data.</span></p><p><strong><span lang="en">Grows with output length.</span></strong></p></div>
+  <div class="twocol">
+    <div class="twocol-col panel accent"><h3><span lang="en">Prefill</span></h3><p><span lang="en">Process the prompt in parallel, build state for all prompt tokens, produce the first next-token distribution.</span></p><p><strong><span lang="en">Grows with input length.</span></strong></p></div>
+    <div class="twocol-col panel"><h3><span lang="en">Decode</span></h3><p><span lang="en">Generate one new token per sequence step, reusing cached state and repeatedly reading model data.</span></p><p><strong><span lang="en">Grows with output length.</span></strong></p></div>
   </div>
   <aside class="slide-notes">Stay qualitative here. Prefill tends to expose parallel compute; decode tends to be constrained by repeated memory movement at small batches. Topic 2 will derive memory and roofline consequences and show exceptions.</aside>
 </section>
-

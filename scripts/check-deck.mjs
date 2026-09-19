@@ -55,6 +55,25 @@ for (const deck of decks) {
   await page.waitForTimeout(1500);
   const meta = await page.$$eval('.slide', (s) => s.map((x) => ({ steps: +(x.dataset.maxStep || 0), type: x.dataset.type, label: x.dataset.screenLabel })));
   const problems = [];
+  const structuralProblems = await page.$$eval('.slide', (slides) => {
+    const required = {
+      title: ['.title-header', '.title-body', '.title-footer'],
+      agenda: ['.agenda-grid'],
+      objectives: ['.obj-list'],
+      divider: ['.divider-content'],
+      formula: ['.formula-stage', '.formula-caption'],
+      'two-col': [':is(.twocol, .def-card)'],
+      quote: ['.quote-mark', 'blockquote'],
+      refs: ['.ref-list'],
+      final: ['.final-body'],
+      table: ['.cmp-table'],
+      walkthrough: ['.walk-flow'],
+    };
+    return slides.flatMap((slide, index) => (required[slide.dataset.type] || [])
+      .filter((selector) => !slide.querySelector(selector))
+      .map((selector) => `${String(index + 1).padStart(2, '0')} ${slide.dataset.screenLabel}: template structure missing ${selector}`));
+  });
+  problems.push(...structuralProblems);
   for (let i = 1; i <= meta.length; i++) {
     const m = meta[i - 1];
     await page.evaluate((h) => { location.hash = h; }, m.steps ? `#/${i}/${m.steps}` : `#/${i}`);

@@ -1,9 +1,8 @@
 <section class="slide" data-type="two-col" data-screen-label="13 Load models">
   <div class="slide-header"><h2><span lang="en">Concurrency is not an arrival process</span></h2><span class="slide-kicker"><span lang="en">Workload</span></span></div>
-  <div class="two-col">
-    <div class="panel"><h3><span lang="en">Closed loop</span></h3><p><span lang="en">A fixed number of clients sends the next request after the previous one completes.</span></p><p><span lang="en">Useful for saturation sweeps; slow service automatically reduces offered load.</span></p></div>
-    <div class="panel"><h3><span lang="en">Open loop</span></h3><p><span lang="en">Requests arrive according to an external rate, independent of completion.</span></p><p><span lang="en">Closer to demand spikes; exposes queue growth and overload.</span></p></div>
+  <div class="twocol">
+    <div class="twocol-col panel"><h3><span lang="en">Closed loop</span></h3><p><span lang="en">A fixed number of clients sends the next request after the previous one completes.</span></p><p><span lang="en">Useful for saturation sweeps; slow service automatically reduces offered load.</span></p></div>
+    <div class="twocol-col panel"><h3><span lang="en">Open loop</span></h3><p><span lang="en">Requests arrive according to an external rate, independent of completion.</span></p><p><span lang="en">Closer to demand spikes; exposes queue growth and overload.</span></p></div>
   </div>
   <aside class="slide-notes">This distinction prevents coordinated omission. A closed-loop client waits when the server is slow, so it may under-sample the worst waiting times. We will use both later and label them.</aside>
 </section>
-

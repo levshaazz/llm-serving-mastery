@@ -1,0 +1,136 @@
+/* Topic 1 diagrams built from the deck's native tokens and type scale. */
+.topic-grid,
+.card-grid,
+.formula-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+
+.topic-card,
+.card,
+.formula-card,
+.panel {
+  min-width: 0;
+  padding: var(--sp-4);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.topic-card h3,
+.card h3,
+.formula-card h3,
+.panel h3 {
+  margin: 0 0 var(--sp-2);
+  color: var(--accent-ink);
+  font-size: var(--fs-h3);
+}
+
+:root[data-theme="dark"] .topic-card h3,
+:root[data-theme="dark"] .card h3,
+:root[data-theme="dark"] .formula-card h3,
+:root[data-theme="dark"] .panel h3 { color: var(--accent); }
+
+.topic-card p,
+.card p,
+.formula-card p,
+.panel p { margin: 0; font-size: var(--fs-small); line-height: 1.35; }
+.panel p + p { margin-top: var(--sp-3); }
+.panel.accent { border-left: 10px solid var(--accent); background: var(--accent-soft); }
+
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-6);
+  margin-top: var(--sp-4);
+  align-items: stretch;
+}
+
+.flow-row {
+  display: grid;
+  grid-template-columns: repeat(9, auto);
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin: var(--sp-6) 0 var(--sp-5);
+}
+
+.flow-step {
+  min-width: 190px;
+  padding: var(--sp-4) var(--sp-3);
+  border: var(--line) solid var(--rule-strong);
+  border-top: 8px solid var(--accent);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  font-size: var(--fs-small) !important;
+  line-height: 1.25;
+}
+
+.flow-step strong { display: block; color: var(--accent-ink); font-size: var(--fs-body); }
+:root[data-theme="dark"] .flow-step strong { color: var(--accent); }
+.flow-arrow { color: var(--accent); font-size: var(--fs-h3); font-weight: 700; }
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--sp-2);
+  margin: var(--sp-6) 0 var(--sp-5);
+}
+
+.timeline-item {
+  position: relative;
+  min-height: 180px;
+  padding: var(--sp-4) var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  border-bottom: 8px solid var(--accent);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--fs-small) !important;
+}
+
+.timeline-item strong { display: block; margin-bottom: var(--sp-2); font-size: var(--fs-body); }
+
+.formula-name {
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-h3) !important;
+  font-weight: 700;
+  margin-bottom: var(--sp-2);
+}
+
+:root[data-theme="dark"] .formula-name { color: var(--accent); }
+
+.big-formula {
+  display: grid;
+  place-items: center;
+  margin: var(--sp-5) 0;
+  padding: var(--sp-5);
+  border-radius: var(--r-lg);
+  background: var(--c-amber-soft);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--fs-math) !important;
+}
+
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.three-col .panel { text-align: center; }
+.three-col .panel > strong { display: block; color: var(--accent-ink); font-size: var(--fs-h3); }
+.lead { margin-top: var(--sp-4); font-size: var(--fs-lead); line-height: 1.3; color: var(--ink-2); }
+.caption { margin-top: var(--sp-3); text-align: center; color: var(--ink-3); font-size: var(--fs-small); }
+
+/* A direct-body callout is retained for compact diagrams; native callouts use icon/body children. */
+.callout.topic-compact {
+  display: block;
+  padding: var(--sp-4) var(--sp-5);
+  border-left: 10px solid var(--accent);
+}

@@ -1,6 +1,10 @@
 <section class="slide" data-type="formula" data-screen-label="26 Capacity envelope">
   <div class="slide-header"><h2><span lang="en">A deployment has a capacity envelope, not one capacity number</span></h2><span class="slide-kicker"><span lang="en">Inputs</span></span></div>
-  <div class="big-formula"><span lang="en">capacity = f(system, workload, SLO)</span></div>
-  <p class="lead"><span lang="en">System = hardware + model + runtime. Workload = prompts + outputs + arrivals.</span></p>
+  <div class="formula-stage">$$\text{capacity} = f(\text{system},\ \text{workload},\ \text{SLO})$$</div>
+  <div class="formula-caption">
+    <div class="var-block"><div class="var-symbol"><span lang="en">System</span></div><div class="var-desc"><span lang="en">hardware + model + runtime</span></div></div>
+    <div class="var-block"><div class="var-symbol"><span lang="en">Workload</span></div><div class="var-desc"><span lang="en">prompts + outputs + arrivals</span></div></div>
+    <div class="var-block"><div class="var-symbol"><span lang="en">SLO</span></div><div class="var-desc"><span lang="en">the boundary that defines useful capacity</span></div></div>
+  </div>
   <aside class="slide-notes">This is why public tokens/s numbers rarely transfer directly to a product. We will build one point on this envelope in the seminar, then expand it across concurrency and configurations later.</aside>
 </section>

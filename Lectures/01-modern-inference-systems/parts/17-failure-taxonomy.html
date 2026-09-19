@@ -1,6 +1,6 @@
 <section class="slide" data-type="table" data-screen-label="17 Failure taxonomy">
   <div class="slide-header"><h2><span lang="en">Production failure is broader than “the process crashed”</span></h2><span class="slide-kicker"><span lang="en">Failure modes</span></span></div>
-  <table><thead><tr><th><span lang="en">Layer</span></th><th><span lang="en">Examples</span></th><th><span lang="en">Evidence</span></th></tr></thead><tbody>
+  <table class="cmp-table"><thead><tr><th><span lang="en">Layer</span></th><th><span lang="en">Examples</span></th><th><span lang="en">Evidence</span></th></tr></thead><tbody>
     <tr><td><span lang="en">Contract</span></td><td><span lang="en">wrong schema, truncated stream, ignored parameter</span></td><td><span lang="en">protocol test</span></td></tr>
     <tr><td><span lang="en">Performance</span></td><td><span lang="en">SLO miss, queue runaway, starvation</span></td><td><span lang="en">client latency + queue metrics</span></td></tr>
     <tr><td><span lang="en">Resource</span></td><td><span lang="en">OOM, fragmentation, disk exhaustion</span></td><td><span lang="en">runtime and host telemetry</span></td></tr>
@@ -8,4 +8,3 @@
   </tbody></table>
   <aside class="slide-notes">A 200 response can still be a failure if it violates the declared contract. Conversely, a deliberate 429 under overload may be healthy behavior if admission control is part of the contract.</aside>
 </section>
-

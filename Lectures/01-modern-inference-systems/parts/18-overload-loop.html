@@ -6,7 +6,6 @@
     <div class="flow-step"><span lang="en">Timeouts</span></div><div class="flow-arrow">→</div>
     <div class="flow-step"><span lang="en">Retries</span></div><div class="flow-arrow">↺</div>
   </div>
-  <div class="callout"><strong><span lang="en">Controls:</span></strong> <span lang="en">bounded queues, admission control, deadlines, cancellation, retry budgets and jitter.</span></div>
+  <div class="callout topic-compact" data-kind="warn"><strong><span lang="en">Controls:</span></strong> <span lang="en">bounded queues, admission control, deadlines, cancellation, retry budgets and jitter.</span></div>
   <aside class="slide-notes">Make the distinction between rejecting early and failing late. Admission control preserves useful capacity. Retry policies belong to the end-to-end system; a server alone cannot prevent all retry amplification.</aside>
 </section>
-

@@ -1,6 +1,6 @@
 <section class="slide" data-type="table" data-screen-label="12 Throughput vocabulary">
   <div class="slide-header"><h2><span lang="en">Throughput also has multiple denominators</span></h2><span class="slide-kicker"><span lang="en">Rates</span></span></div>
-  <table><thead><tr><th><span lang="en">Metric</span></th><th><span lang="en">Useful for</span></th><th><span lang="en">Can hide</span></th></tr></thead><tbody>
+  <table class="cmp-table"><thead><tr><th><span lang="en">Metric</span></th><th><span lang="en">Useful for</span></th><th><span lang="en">Can hide</span></th></tr></thead><tbody>
     <tr><td><span lang="en">requests / second</span></td><td><span lang="en">product demand</span></td><td><span lang="en">request-size variation</span></td></tr>
     <tr><td><span lang="en">output tokens / second</span></td><td><span lang="en">generation capacity</span></td><td><span lang="en">prompt work</span></td></tr>
     <tr><td><span lang="en">total tokens / second</span></td><td><span lang="en">aggregate token processing</span></td><td><span lang="en">phase mix</span></td></tr>
@@ -8,4 +8,3 @@
   </tbody></table>
   <aside class="slide-notes">A system can increase raw throughput by making every user too slow. Goodput counts only requests or tokens that satisfy the declared service objective and is often the better optimization target.</aside>
 </section>
-
