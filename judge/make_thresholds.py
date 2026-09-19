@@ -27,19 +27,34 @@ def main():
     ap.add_argument("--note", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--config", default=str(HERE / "config.yaml"))
+    ap.add_argument("--allow-unverified-reference", action="store_true",
+                    help="emergency override; the output remains marked unverified and must not be used for grading")
     a = ap.parse_args()
-    sc = yaml.safe_load(open(a.config))["scoring"]
+    cfg = yaml.safe_load(open(a.config))
+    sc = cfg["scoring"]
     ref = json.load(open(a.reference))
     if not ref.get("ok"):
         sys.exit(f"reference run failed: {ref.get('error')}")
+    if ref.get("config_version") != cfg["version"]:
+        sys.exit(f"reference config version {ref.get('config_version')} != current {cfg['version']}; rerun it")
+    verified = bool((ref.get("provenance") or {}).get("complete"))
+    if not verified and not a.allow_unverified_reference:
+        sys.exit("reference has no complete machine-generated provenance; rerun it instead of reconstructing bars")
     st = ref["steps"]
     if speed_score(st["speed"]) <= 0:
         sys.exit("reference S is 0 — refusing to publish a bar that would divide by zero")
-    if (st.get("canary") or {}).get("similarity_mean", 0) < sc["canary_min_similarity"]:
+    can = st.get("canary") or {}
+    if can.get("similarity_min", 0) < sc["canary_min_similarity"]:
         sys.exit(f"the reference itself fails the canary check ({st.get('canary')}) — recalibrate before publishing")
+    if can.get("short_outputs", 1) > sc["canary_max_short_outputs"]:
+        sys.exit(f"the reference has short hidden outputs ({can}) — fix the run before publishing")
+    if can.get("unique_output_share", 0) < sc["canary_min_unique_share"]:
+        sys.exit(f"the reference fails output-diversity checks ({can})")
     th = {
         "round": a.round,
         "note": a.note,
+        "verified": verified,
+        "judge_provenance": ref.get("provenance"),
         "reference": {"gpu": st["gpu"]["name"], "submission": st["contract"]["submission"],
                       "quality": st["quality"], "speed": st["speed"], "measured_at": ref["started_at"]},
         "quality_gates": {k: round(sc["quality_share"] * v, 4) for k, v in st["quality"].items()},
@@ -48,6 +63,9 @@ def main():
         "max_error_rate": sc["max_error_rate"],
         "min_output_share": sc["min_output_share"],
         "canary_min_similarity": sc["canary_min_similarity"],
+        "canary_similarity_stat": "min",
+        "canary_max_short_outputs": sc["canary_max_short_outputs"],
+        "canary_min_unique_share": sc["canary_min_unique_share"],
     }
     pathlib.Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     json.dump(th, open(a.out, "w"), indent=2)

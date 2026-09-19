@@ -1,0 +1,12 @@
+<section class="slide" data-type="formula" data-screen-label="15 Little law">
+  <div class="slide-header"><h2><span lang="en">Little’s Law is a consistency check, not a capacity oracle</span></h2><span class="slide-kicker"><span lang="en">Reasoning tool</span></span></div>
+  <div class="big-formula">$$L = \lambda W$$</div>
+  <div class="three-col">
+    <div class="panel"><strong>\(L\)</strong><p><span lang="en">average requests in the system</span></p></div>
+    <div class="panel"><strong>\(\lambda\)</strong><p><span lang="en">long-run completed arrival rate</span></p></div>
+    <div class="panel"><strong>\(W\)</strong><p><span lang="en">average time in the system</span></p></div>
+  </div>
+  <p class="caption"><span lang="en">Applies to a stable system over a consistent boundary and observation window.</span></p>
+  <aside class="slide-notes">Example: 8 completed requests/s with 0.5 s mean time implies about 4 requests in the chosen system boundary. It does not predict GPU capacity, p95, or behavior in an unstable growing queue.</aside>
+</section>
+

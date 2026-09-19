@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # dry_run.sh — the weekly dry run (Tuesdays): does each student's CURRENT default branch start on the judge?
-#   judge/dry_run.sh
+#   JUDGE_EGRESS_BLOCKED=1 judge/dry_run.sh
 # Contract + start-up + smoke test only (no quality, no speed, nothing scored), on the judge GPU in the
 # sandbox, so FP8 / NVFP4 / Blackwell-only paths get a real start-up check before Thursday. Logs are
 # published to data/dry-run/<student>/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+: "${JUDGE_EGRESS_BLOCKED:?verify the internal measurement network, then set JUDGE_EGRESS_BLOCKED=1}"
 [ -f judge/roster.csv ] || { echo "no judge/roster.csv"; exit 1; }
 PUB=data/dry-run; rm -rf "$PUB"; mkdir -p "$PUB"
 exec 3< <(tail -n +2 judge/roster.csv)

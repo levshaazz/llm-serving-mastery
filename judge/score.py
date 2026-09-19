@@ -8,9 +8,9 @@ score.py — turn a round's result.json files into marks, ranks and Overdrive.
 Rules (the same text is on the slides, the syllabus and the leaderboard page):
   rerun   a run that failed because of the judge (judge_error) is never scored — it is listed for a rerun
   gates   contract + start-up + smoke ok · every quality score ≥ its gate ·
-          canaries: the same prompts answered at rest and under load must match (same model) ·
-          p95 TTFT at 64 clients ≤ SLO · error rate ≤ max and answers ≥ min_output_share of
-          the requested length at every level
+          canaries: every at-rest/under-load pair must match, every hidden response must meet
+          the per-request length floor, and diverse prompts must not collapse to one answer ·
+          p95 TTFT at 64 clients ≤ SLO · error rate ≤ max
   S       geometric mean of output tok/s at 32 and 64 clients
   mark    5 × min(1, S / S_bar) if every gate passes, else 0
   points  mark × 0.8  (each round = 4% of the course grade)
@@ -36,9 +36,18 @@ def gates(result, th):
     st = result["steps"]
     why = []
     can = st.get("canary") or {}
-    if can.get("similarity_mean") is None or can["similarity_mean"] < th["canary_min_similarity"]:
-        why.append(f"canary: answers under load differ from answers at rest (similarity {can.get('similarity_mean')} "
-                   f"< {th['canary_min_similarity']}) — the same model must serve every request")
+    stat = th.get("canary_similarity_stat", "mean")
+    similarity_value = can.get(f"similarity_{stat}")
+    if similarity_value is None or similarity_value < th["canary_min_similarity"]:
+        why.append(f"canary: {stat} at-rest/under-load similarity {similarity_value} "
+                   f"< {th['canary_min_similarity']}")
+    if "canary_max_short_outputs" in th:
+        short = can.get("short_outputs")
+        if short is None or short > th["canary_max_short_outputs"]:
+            why.append(f"canary: {short} per-request length failures; allowed {th['canary_max_short_outputs']}")
+        unique = can.get("unique_output_share")
+        if unique is None or unique < th["canary_min_unique_share"]:
+            why.append(f"canary: output diversity {unique} < {th['canary_min_unique_share']} (possible canned answers)")
     for task, gate in th["quality_gates"].items():
         got = st.get("quality", {}).get(task)
         if got is None:
@@ -54,9 +63,12 @@ def gates(result, th):
         total = (m.get("requests_ok") or 0) + (m.get("requests_failed") or 0)
         if total == 0 or (m.get("requests_failed") or 0) / total > th["max_error_rate"]:
             why.append(f"error rate too high at {lvl} clients ({m.get('requests_failed')}/{total})")
-        got, want = m.get("output_tokens_mean"), m.get("output_tokens_expected")
-        if not got or not want or got < th["min_output_share"] * want:
-            why.append(f"answers too short at {lvl} clients ({got} of {want} tokens) — honour max_tokens and ignore_eos")
+        # Version-2 thresholds used GuideLLM's aggregate mean. Version 3+ uses per-request
+        # hidden probes above, because an average can hide short responses.
+        if "canary_max_short_outputs" not in th:
+            got, want = m.get("output_tokens_mean"), m.get("output_tokens_expected")
+            if not got or not want or got < th["min_output_share"] * want:
+                why.append(f"answers too short at {lvl} clients ({got} of {want} tokens)")
     ttft = sp.get("64", {}).get("ttft_p95_s")
     if ttft is None:
         why.append("no p95 TTFT at 64 clients")

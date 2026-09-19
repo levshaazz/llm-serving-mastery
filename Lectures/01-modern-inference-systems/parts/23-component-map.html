@@ -1,0 +1,13 @@
+<section class="slide" data-type="process" data-screen-label="23 Component map">
+  <div class="slide-header"><h2><span lang="en">A minimal production map separates policy from execution</span></h2><span class="slide-kicker"><span lang="en">Responsibilities</span></span></div>
+  <div class="card-grid">
+    <div class="card"><h3><span lang="en">Gateway</span></h3><p><span lang="en">identity, validation, quotas, request IDs</span></p></div>
+    <div class="card"><h3><span lang="en">Router</span></h3><p><span lang="en">model and replica placement</span></p></div>
+    <div class="card"><h3><span lang="en">Scheduler</span></h3><p><span lang="en">queue and execution policy</span></p></div>
+    <div class="card"><h3><span lang="en">Workers</span></h3><p><span lang="en">tokenization, model execution, streaming</span></p></div>
+    <div class="card"><h3><span lang="en">Artifact store</span></h3><p><span lang="en">immutable model bundles</span></p></div>
+    <div class="card"><h3><span lang="en">Telemetry</span></h3><p><span lang="en">logs, metrics, traces and cost</span></p></div>
+  </div>
+  <aside class="slide-notes">This is a responsibility map, not a mandated microservice diagram. In a small deployment, gateway, router and scheduler may live in one process. Their policies still need distinct tests.</aside>
+</section>
+

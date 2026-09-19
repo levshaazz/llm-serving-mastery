@@ -1,5 +1,6 @@
 {
-  "note": "Reconstructed from the printed output of the Colab run (the VM was lost before result.json could be downloaded); the full console output is in round-01.colab-run.log next to this file.",
+  "note": "LEGACY, UNVERIFIED: reconstructed from printed Colab output after the VM was lost. Retained only for historical comparison; config v3 requires a fresh machine-generated reference before grading.",
+  "provenance": {"complete": false, "reason": "reconstructed from console output"},
   "started_at": "2026-09-19T08:40:00+00:00",
   "config_version": 2,
   "ok": true,

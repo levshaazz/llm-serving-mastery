@@ -33,7 +33,7 @@
               <div class="walk-num">04</div>
               <div class="walk-content">
                 <div class="walk-label"><span lang="en">64 clients</span></div>
-                <div class="walk-detail"><span lang="en">\(64 \times 6.4\) s. And the GPU was mostly idle the whole time — the next two slides show why.</span></div>
+                <div class="walk-detail"><span lang="en">\(64 \times 6.4\) s. The compute units were under-utilized while each decode step repeatedly streamed model weights from memory — the next two slides show why.</span></div>
               </div>
               <div class="walk-state">6.8 min</div>
             </div>
@@ -42,4 +42,4 @@
         </section>
 
         <!-- ============================================ FORMULA · decode is memory-bound ============================================ -->
-        
+

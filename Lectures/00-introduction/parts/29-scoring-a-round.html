@@ -11,14 +11,13 @@
               <tr><td><span lang="en">Snapshot</span></td><td><span lang="en">Thursday 23:59 MSK: the commit your <code>round-NN</code> tag points to. No tag → 0.</span></td></tr>
               <tr><td><span lang="en">Contract</span></td><td><span lang="en">Server starts and lists <code>submission</code> within 30 min; a streamed smoke answer works.</span></td></tr>
               <tr><td><span lang="en">Quality gate</span></td><td><span lang="en">GSM8K, IFEval, MMLU-Pro subsets (lm-eval): each ≥ 90% of the reference.</span></td></tr>
-              <tr><td><span lang="en">Latency gate</span></td><td><span lang="en">p95 TTFT at 64 clients ≤ the round's SLO; errors ≤ 1%; answers really 256 tokens.</span></td></tr>
-              <tr><td><span lang="en">Same model</span></td><td><span lang="en">Hidden canary prompts, answered at rest and again under load, must match.</span></td></tr>
+              <tr><td><span lang="en">Latency & honesty gates</span></td><td><span lang="en">p95 TTFT among successful requests at 64 clients ≤ the round's SLO; errors ≤ 1%; every hidden length probe ≥ 95% of 256 tokens.</span></td></tr>
+              <tr><td><span lang="en">Same model</span></td><td><span lang="en">Every hidden at-rest/load pair must match; per-request length and output-diversity checks also pass.</span></td></tr>
               <tr><td><span lang="en">Speed</span></td><td><span lang="en">\(S = \sqrt{\text{tok/s}_{32} \cdot \text{tok/s}_{64}}\)</span></td></tr>
               <tr><td><span lang="en">Mark 0–5</span></td><td><span lang="en">\(5 \times \min(1,\ S / S_{\text{bar}})\); any failed gate → 0. <strong>Round = 4%</strong>: points = mark × 0.8.</span></td></tr>
             </tbody>
           </table>
-          <aside class="slide-notes">Top to bottom, every round. The snapshot makes the deadline real. A server that does not start, or that got fast by getting dumb, scores zero — the quality gate stops quantizing a model into nonsense, the latency gate stops buying throughput with a 30-second first token, the output-length check stops servers that ignore max_tokens / ignore_eos. Among valid submissions only S matters: the geometric mean of throughput at 32 and 64 clients, so you cannot win on one level and collapse on the other. The mark is proportional: half the bar = 2.5 of 5. Each round is worth 4% of the course grade (mark × 0.8); ten rounds = 40%.</aside>
+          <aside class="slide-notes">Top to bottom, every round. The snapshot makes the deadline real. A server that does not start, or that got fast by getting dumb, scores zero — quality, latency, errors and layered hidden probes are independent gates. Length is checked per hidden response, not by the GuideLLM mean; same-model similarity uses the worst pair, not the average; diverse prompts must not collapse to one canned output. These are practical anti-gaming checks, not cryptographic proof, so raw artifacts and provenance are retained for audit. Among valid submissions only S matters: the geometric mean of throughput at 32 and 64 clients. The mark is proportional: half the bar = 2.5 of 5. Each round is worth 4% of the course grade (mark × 0.8); ten rounds = 40%.</aside>
         </section>
 
         <!-- ============================================ TWO-COL · the defense ============================================ -->
-        

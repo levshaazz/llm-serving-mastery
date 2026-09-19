@@ -9,9 +9,10 @@ run_submission.py — measure ONE leaderboard submission exactly the way the jud
 
 Pipeline (each step is recorded in <out>/result.json; logs next to it):
   1. fetch     clean checkout of the ref (git URL, bare mirror, or a copy of a local directory)
-  2. contract  submission.yaml + JOURNAL.md, and either a Dockerfile or serve.sh + pyproject.toml + uv.lock
+  2. contract  submission.yaml + JOURNAL.md, and either a self-contained Dockerfile or
+               prepare.sh + serve.sh + pyproject.toml + uv.lock
   3. gpu       the GPU and the port must be free before we start
-  4. start     Dockerfile → docker build/run; else `bash serve.sh` (inside a container with --sandbox docker);
+  4. start     Dockerfile → build then offline run; else networked `prepare.sh` followed by offline `serve.sh`;
                wait until /v1/models lists "submission"
   5. smoke     one streaming chat completion must return text
   6. canary    a few speed-style prompts answered at rest (compared with the same prompts under load, step 8)
@@ -28,10 +29,9 @@ The judge's tools (lm-eval, GuideLLM, datasets) run in the judge's Python with t
 submission gets its own environment from its uv.lock, its own HF cache, and an allow-listed environment.
 The secret seed ($JUDGE_SEED) is never written to a log or to result.json.
 """
-import argparse, datetime as dt, difflib, glob, json, os, pathlib, random, shutil, signal, subprocess, sys, threading, time
+import argparse, concurrent.futures, datetime as dt, difflib, glob, hashlib, importlib.metadata, json, os, pathlib
+import platform, random, shutil, signal, subprocess, sys, tempfile, threading, time
 import urllib.error, urllib.request
-
-import yaml
 
 HERE = pathlib.Path(__file__).resolve().parent
 DEVNULL = subprocess.DEVNULL
@@ -55,23 +55,42 @@ class JudgeError(Exception):
     """The judge failed (not the student): the run must be repeated, never scored."""
 
 
+class Deadline:
+    """One wall-clock budget for the entire run, not a fresh timeout for every step."""
+
+    def __init__(self, seconds):
+        self.seconds = seconds
+        self.end = time.monotonic() + seconds
+
+    def timeout(self, cap, phase):
+        left = self.end - time.monotonic()
+        if left <= 0:
+            raise Step(f"over the per-submission time budget of {self.seconds} s during {phase}")
+        return max(1, min(cap, left))
+
+    def check(self, phase):
+        self.timeout(1, phase)
+
+
 # ── 1. fetch ─────────────────────────────────────────────────────────────────────────────
 def is_git_dir(p):
     p = pathlib.Path(p)
     return p.is_dir() and (((p / "HEAD").is_file() and (p / "objects").is_dir()) or (p / ".git").exists())
 
 
-def fetch(repo, ref, dest):
+def fetch(repo, ref, dest, deadline):
     if dest.exists():
         shutil.rmtree(dest)
     if os.path.isdir(repo) and not is_git_dir(repo):
         shutil.copytree(repo, dest, ignore=shutil.ignore_patterns(".venv", "__pycache__", ".git", "._*"))
         return {"source": "local", "path": os.path.abspath(repo), "commit": None}
     env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
-    r = sh(["git", "clone", "--quiet", "--no-checkout", repo, str(dest)], env=env, timeout=600)
+    r = sh(["git", "clone", "--quiet", "--no-checkout", repo, str(dest)], env=env,
+           timeout=deadline.timeout(600, "git clone"))
     if r.returncode:
         raise Step(f"git clone failed: {r.stderr.strip()[-500:]}")
-    r = sh(["git", "-C", str(dest), "checkout", "--quiet", ref or "HEAD"], env=env, timeout=300)
+    r = sh(["git", "-C", str(dest), "checkout", "--quiet", ref or "HEAD"], env=env,
+           timeout=deadline.timeout(300, "git checkout"))
     if r.returncode:
         raise Step(f"git checkout {ref!r} failed: {r.stderr.strip()[-500:]}")
     sha = sh(["git", "-C", str(dest), "rev-parse", "HEAD"]).stdout.strip()
@@ -81,6 +100,8 @@ def fetch(repo, ref, dest):
 
 # ── 2. contract ──────────────────────────────────────────────────────────────────────────
 def check_contract(src, cfg):
+    import yaml
+
     c, errors, warnings, meta = cfg["contract"], [], [], {}
     for f in c["required_files"]:
         if not (src / f).is_file():
@@ -117,11 +138,13 @@ def gpu_info():
     return {"name": name, "memory_total_mib": int(total), "memory_used_mib": int(used), "driver": driver}
 
 
-def wait_gpu_idle(cfg, kill=False):
+def wait_gpu_idle(cfg, kill=False, deadline=None):
     """Wait until the GPU is idle; with kill=True, SIGKILL whatever still holds it (leftovers of a submission)."""
     limit = cfg["server"]["gpu_idle_mib"]
     for _ in range(2 if kill else 1):
         for _ in range(60):
+            if deadline:
+                deadline.check("waiting for an idle GPU")
             if gpu_info()["memory_used_mib"] <= limit:
                 return True
             time.sleep(1)
@@ -139,23 +162,47 @@ def port_free(port):
     return sh(f"ss -ltnH 'sport = :{port}'").stdout.strip() == ""
 
 
+def verify_docker_egress_blocked(cfg, deadline):
+    """Fail closed unless a normal judge-network container can run but cannot reach the public Internet."""
+    network = cfg["server"]["measurement_network"]
+    inspected = sh(["docker", "network", "inspect", network],
+                   timeout=deadline.timeout(30, "measurement network inspection"))
+    if inspected.returncode:
+        raise JudgeError(f"missing Docker network {network!r}; create it with --internal")
+    if not json.loads(inspected.stdout)[0].get("Internal"):
+        raise JudgeError(f"Docker network {network!r} is not internal")
+    base = ["docker", "run", "--rm", "--read-only", "--cap-drop=ALL",
+            "--security-opt=no-new-privileges", "--pids-limit", "64", "--network", network,
+            cfg["server"]["sandbox_image"]]
+    healthy = sh(base + ["python", "-c", "print('ok')"],
+                 timeout=deadline.timeout(120, "sandbox image preflight"))
+    if healthy.returncode:
+        raise JudgeError(f"sandbox image preflight failed: {healthy.stderr.strip()[-500:]}")
+    probe = sh(base + ["python", "-c",
+                       "import socket; s=socket.create_connection(('1.1.1.1',80),5); s.close()"],
+               timeout=deadline.timeout(30, "submission egress probe"))
+    if probe.returncode == 0:
+        raise JudgeError("submission-container egress is open; repair the internal measurement network before scoring")
+    return {"blocked": True, "probe": "TCP 1.1.1.1:80 denied"}
+
+
 # ── 4. start / stop ──────────────────────────────────────────────────────────────────────
 def http_json(url, timeout=5):
     with urllib.request.urlopen(url, timeout=timeout) as r:
         return json.loads(r.read())
 
 
-def submission_env(cfg):
+def submission_env(cfg, cache_dir):
     """Only allow-listed variables reach the submission — never JUDGE_*, tokens or the judge's caches."""
     keep = {k: v for k, v in os.environ.items() if k in cfg["server"]["env_allowlist"]}
-    keep["HF_HOME"] = os.path.expanduser(cfg["server"]["submission_hf_home"])
+    keep["HF_HOME"] = str(cache_dir)
     return keep
 
 
-def start_server(src, cfg, out, tag, sandbox):
+def start_server(src, cfg, out, tag, sandbox, cache_dir, runtime_dir, deadline, submission):
     port = cfg["server"]["port"]
     log = open(out / "serve.log", "w")
-    env = submission_env(cfg)
+    env = submission_env(cfg, cache_dir)
     os.makedirs(env["HF_HOME"], exist_ok=True)
     if (src / "Dockerfile").is_file() or sandbox == "docker":
         image, name = f"lsm-{tag}".lower(), f"lsm-run-{tag}".lower()
@@ -163,16 +210,45 @@ def start_server(src, cfg, out, tag, sandbox):
         if (src / "Dockerfile").is_file():
             try:
                 b = subprocess.run(["docker", "build", "-t", image, str(src)], stdout=log, stderr=subprocess.STDOUT,
-                                   stdin=DEVNULL, timeout=cfg["server"]["docker_build_timeout_s"])
+                                   stdin=DEVNULL,
+                                   timeout=deadline.timeout(cfg["server"]["docker_build_timeout_s"], "docker build"))
             except subprocess.TimeoutExpired:
                 raise Step(f"docker build took longer than {cfg['server']['docker_build_timeout_s']} s")
             if b.returncode:
                 raise Step("docker build failed (see serve.log)")
             run_cmd = [image]
         else:  # the sandbox for serve.sh: the student's code never runs as the judge's user
-            run_cmd = ["-v", f"{src}:/work", "-w", "/work", cfg["server"]["sandbox_image"], "bash", "serve.sh"]
-        cmd = ["docker", "run", "--rm", "--name", name, "--gpus", "all", "--ipc=host", "-p", f"{port}:{port}",
-               "-v", f"{env['HF_HOME']}:/root/.cache/huggingface", "-e", "HF_HOME=/root/.cache/huggingface"]
+            common = ["--rm", "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges",
+                      "--pids-limit", str(cfg["server"]["pids_limit"]), "--ipc=private",
+                      "--tmpfs", "/tmp:rw,exec,nosuid,size=16g", "-v", f"{src}:/work:ro",
+                      "-v", f"{runtime_dir}:/runtime", "-v", f"{env['HF_HOME']}:/root/.cache/huggingface",
+                      "-e", "HF_HOME=/root/.cache/huggingface", "-e", "HOME=/tmp/home",
+                      "-e", "UV_CACHE_DIR=/tmp/uv-cache", "-e", "UV_PROJECT_ENVIRONMENT=/runtime/.venv",
+                      "-w", "/work"]
+            # Bootstrap has egress but receives no judge seed or prompts. Only its ephemeral runtime/cache
+            # survive into the measurement container, which runs on the internal network below.
+            try:
+                prep = subprocess.run(["docker", "run"] + common + [cfg["server"]["sandbox_image"],
+                                      "bash", "prepare.sh"], stdout=log, stderr=subprocess.STDOUT, stdin=DEVNULL,
+                                      timeout=deadline.timeout(cfg["server"]["docker_build_timeout_s"], "prepare.sh"))
+            except subprocess.TimeoutExpired:
+                raise Step("prepare.sh exceeded the remaining time budget")
+            if prep.returncode:
+                raise Step("prepare.sh failed (see serve.log)")
+            model_key = "models--" + submission["model"].strip("/").replace("/", "--")
+            snapshot = cache_dir / "hub" / model_key / "snapshots" / submission["model_revision"]
+            if not snapshot.is_dir():
+                raise Step(f"prepare.sh did not cache declared model revision {submission['model_revision']}")
+            run_cmd = ["-v", f"{src}:/work:ro", "-v", f"{runtime_dir}:/runtime",
+                       "-w", "/work", cfg["server"]["sandbox_image"], "bash", "serve.sh"]
+        cmd = ["docker", "run", "--rm", "--name", name, "--gpus", "all", "--read-only",
+               "--cap-drop=ALL", "--security-opt=no-new-privileges", "--pids-limit",
+               str(cfg["server"]["pids_limit"]), "--ipc=private", "--tmpfs", "/tmp:rw,exec,nosuid,size=16g",
+               "--tmpfs", "/run:rw,noexec,nosuid,size=64m", "--network", cfg["server"]["measurement_network"],
+               "-p", f"{port}:{port}",
+               "-v", f"{env['HF_HOME']}:/root/.cache/huggingface", "-e", "HF_HOME=/root/.cache/huggingface",
+               "-e", "HOME=/tmp/home", "-e", "UV_CACHE_DIR=/tmp/uv-cache",
+               "-e", "UV_PROJECT_ENVIRONMENT=/work/.venv"]
         for k in cfg["server"]["env_allowlist"]:
             if k in env and k not in ("PATH", "HOME"):
                 cmd += ["-e", f"{k}={env[k]}"]
@@ -184,10 +260,11 @@ def start_server(src, cfg, out, tag, sandbox):
     return {"mode": "serve.sh", "proc": proc}
 
 
-def wait_ready(server, cfg):
+def wait_ready(server, cfg, deadline):
     port, name = cfg["server"]["port"], cfg["server"]["model_name"]
     t0 = time.time()
     while time.time() - t0 < cfg["server"]["startup_timeout_s"]:
+        deadline.check("server startup")
         if server["proc"].poll() is not None:
             raise Step(f"server exited with code {server['proc'].returncode} before becoming ready (see serve.log)")
         try:
@@ -222,6 +299,19 @@ def stop_server(server, cfg):
             continue
 
 
+def cleanup_submission_state(cfg, cache_dir, runtime_dir):
+    """Remove files even when a root-running container created them on a Linux bind mount."""
+    shutil.rmtree(cache_dir, ignore_errors=True)
+    shutil.rmtree(runtime_dir, ignore_errors=True)
+    if (cache_dir.exists() or runtime_dir.exists()) and shutil.which("docker"):
+        sh(["docker", "run", "--rm", "--network", "none", "--read-only", "--cap-drop=ALL",
+            "--security-opt=no-new-privileges", "-v", f"{cache_dir}:/state/cache",
+            "-v", f"{runtime_dir}:/state/runtime", cfg["server"]["sandbox_image"],
+            "sh", "-c", "rm -rf /state/cache/* /state/cache/.[!.]* /state/runtime/* /state/runtime/.[!.]* 2>/dev/null || true"])
+        shutil.rmtree(cache_dir, ignore_errors=True)
+        shutil.rmtree(runtime_dir, ignore_errors=True)
+
+
 # ── 5. smoke ─────────────────────────────────────────────────────────────────────────────
 def stream_chat(body, port, timeout):
     """POST a streaming chat completion; return (text, n_chunks). Raises Step on any protocol/network error."""
@@ -244,10 +334,10 @@ def stream_chat(body, port, timeout):
     return "".join(text), chunks
 
 
-def smoke(cfg):
+def smoke(cfg, deadline):
     body = {"model": cfg["server"]["model_name"], "stream": True, "max_tokens": 32, "temperature": 0,
             "messages": [{"role": "user", "content": "Say hello in five words."}]}
-    text, chunks = stream_chat(body, cfg["server"]["port"], 120)
+    text, chunks = stream_chat(body, cfg["server"]["port"], deadline.timeout(120, "smoke test"))
     if not text.strip():
         raise Step("smoke test: streaming chat completion returned no text")
     if chunks < 2:
@@ -262,8 +352,9 @@ def build_prompts(cfg, seed, path):
     from datasets import load_dataset
     from transformers import AutoTokenizer
     s, k = cfg["speed"], cfg["canary"]["count"]
-    tok = AutoTokenizer.from_pretrained(s["tokenizer"])
-    ds = load_dataset(s["corpus"]["path"], s["corpus"]["name"], split=s["corpus"]["split"])
+    tok = AutoTokenizer.from_pretrained(s["tokenizer"], revision=s["tokenizer_revision"])
+    ds = load_dataset(s["corpus"]["path"], s["corpus"]["name"], split=s["corpus"]["split"],
+                      revision=s["corpus"]["revision"])
     paras = [t.strip() for t in ds["text"] if len(t.strip()) > 200 and not t.strip().startswith("=")]
     random.Random(seed).shuffle(paras)
     need = k + s["requests_per_level"] + 2 * max(s["concurrency"])
@@ -283,11 +374,11 @@ def build_prompts(cfg, seed, path):
     with open(path, "w") as f:
         for r in rows[k:]:
             f.write(json.dumps({"prompt": r, "output_tokens_count": s["output_tokens"]}) + "\n")
-    return rows[:k]
+    return rows[:k], tok
 
 
 def speed_body(cfg, prompt):
-    """The request GuideLLM sends (same fields, same extras), so a canary is indistinguishable from load."""
+    """Mirror the GuideLLM request shape and configured extras for hidden probes."""
     return {"model": cfg["server"]["model_name"], "stream": True,
             "stream_options": {"include_usage": True, "continuous_usage_stats": True},
             "max_completion_tokens": cfg["speed"]["output_tokens"], "ignore_eos": True,
@@ -300,6 +391,22 @@ def similarity(a, b, n=600):
 
 
 # ── 7. quality ───────────────────────────────────────────────────────────────────────────
+def prepare_quality_datasets(cfg, deadline):
+    """Fetch only declared immutable revisions before the offline measurement phase."""
+    from datasets import load_dataset
+
+    pinned = {}
+    for task, spec in cfg["quality"]["tasks"].items():
+        deadline.check(f"prefetching {task}")
+        kwargs = {"revision": spec["dataset_revision"]}
+        if spec.get("dataset_name"):
+            kwargs["name"] = spec["dataset_name"]
+        load_dataset(spec["dataset_path"], **kwargs)
+        pinned[task] = {"path": spec["dataset_path"], "name": spec.get("dataset_name"),
+                        "revision": spec["dataset_revision"]}
+    return pinned
+
+
 def quality_samples(cfg, task, seed):
     spec, rng = cfg["quality"]["tasks"][task], random.Random(f"{seed}:{task}")
     if task == "mmlu_pro":
@@ -307,7 +414,7 @@ def quality_samples(cfg, task, seed):
     return {task: sorted(rng.sample(range(spec["pool"]), spec["n"]))}
 
 
-def run_quality(cfg, out, seed, judge_env):
+def run_quality(cfg, out, seed, judge_env, deadline):
     q, port, name = cfg["quality"], cfg["server"]["port"], cfg["server"]["model_name"]
     scores, qdir = {}, out / "lm_eval"
     for task, spec in q["tasks"].items():
@@ -326,7 +433,7 @@ def run_quality(cfg, out, seed, judge_env):
             log.write(f"lm_eval --tasks {task}  (subset chosen with the secret seed)\n\n"); log.flush()
             try:
                 r = subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT, stdin=DEVNULL,
-                                   timeout=spec["timeout_s"], env=judge_env)
+                                   timeout=deadline.timeout(spec["timeout_s"], f"lm-eval {task}"), env=judge_env)
             except subprocess.TimeoutExpired:
                 raise Step(f"lm-eval {task}: timed out after {spec['timeout_s']} s")
         if r.returncode:
@@ -345,7 +452,7 @@ def run_quality(cfg, out, seed, judge_env):
 
 
 # ── 8. speed ─────────────────────────────────────────────────────────────────────────────
-def run_speed(cfg, out, seed, prompts_path, canaries, judge_env):
+def run_speed(cfg, out, seed, prompts_path, canaries, judge_env, deadline):
     """Returns ({level: metrics}, {level: [(canary index, text under load)]})."""
     s, port, name = cfg["speed"], cfg["server"]["port"], cfg["server"]["model_name"]
     levels, under_load = {}, {}
@@ -374,7 +481,8 @@ def run_speed(cfg, out, seed, prompts_path, canaries, judge_env):
         def fire(i, delay):
             time.sleep(delay)
             try:
-                texts[i] = stream_chat(speed_body(cfg, canaries[i]), port, 900)[0]
+                texts[i] = stream_chat(speed_body(cfg, canaries[i]), port,
+                                       deadline.timeout(900, f"canary at concurrency {c}"))[0]
             except Step:
                 texts[i] = ""
         threads = [threading.Thread(target=fire, args=(i, s["canary_delay_s"] + j * s["canary_spacing_s"]), daemon=True)
@@ -385,7 +493,8 @@ def run_speed(cfg, out, seed, prompts_path, canaries, judge_env):
                 t.start()
             try:
                 r = subprocess.run(cmd, stdout=log, stderr=subprocess.STDOUT, stdin=DEVNULL,
-                                   timeout=s["timeout_s"], env=judge_env)
+                                   timeout=deadline.timeout(s["timeout_s"], f"GuideLLM at concurrency {c}"),
+                                   env=judge_env)
             except subprocess.TimeoutExpired:
                 raise Step(f"GuideLLM at concurrency {c}: timed out after {s['timeout_s']} s")
             for t in threads:
@@ -421,7 +530,7 @@ def _dig(d, path):
 
 
 def parse_guidellm(report, expected_output_tokens):
-    """Steady-state numbers of one GuideLLM run (schema of guidellm 0.7.x, pinned in requirements.txt)."""
+    """Steady-state numbers of one GuideLLM run (schema of guidellm 0.7.x, pinned in requirements.lock)."""
     b = report["benchmarks"][0]
     m, sm = b["metrics"], b["scheduler_metrics"]
     fields = {
@@ -435,7 +544,7 @@ def parse_guidellm(report, expected_output_tokens):
     got = {k: _dig(m, p) for k, p in fields.items()}
     missing = [k for k, v in got.items() if v is None]
     if missing:  # a schema change must never turn into a silent 0 for a student
-        raise JudgeError(f"GuideLLM report lacks {missing} — schema changed? (version pinned in requirements.txt)")
+        raise JudgeError(f"GuideLLM report lacks {missing} — schema changed? (version pinned in requirements.lock)")
     return {
         "output_tok_s": round(got["output_tok_s"], 2),
         "ttft_p50_s": round(got["ttft_p50_ms"] / 1000, 4),
@@ -449,8 +558,57 @@ def parse_guidellm(report, expected_output_tokens):
     }
 
 
+def provenance(config_path):
+    """Information needed to reproduce and audit a measurement without exposing the seed."""
+    packages = {}
+    for name in ("lm_eval", "guidellm", "datasets", "transformers", "PyYAML"):
+        try:
+            packages[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            packages[name] = None
+    rev = sh(["git", "-C", str(HERE.parent), "rev-parse", "HEAD"]).stdout.strip() or None
+    dirty = bool(sh(["git", "-C", str(HERE.parent), "status", "--porcelain", "--untracked-files=no"]).stdout.strip())
+    raw = pathlib.Path(config_path).read_bytes()
+    lock_path = HERE / "requirements.lock"
+    lock_sha = hashlib.sha256(lock_path.read_bytes()).hexdigest() if lock_path.is_file() else None
+    complete = bool(rev and lock_sha and not dirty and all(packages.values()))
+    return {"complete": complete, "judge_commit": rev, "judge_dirty": dirty,
+            "config_sha256": hashlib.sha256(raw).hexdigest(), "dependency_lock_sha256": lock_sha,
+            "python": platform.python_version(),
+            "platform": platform.platform(), "packages": packages}
+
+
+def verify_model_identity(contract, ready):
+    declared = contract["submission"]["model"].strip().rstrip("/").lower()
+    root = str(ready.get("root") or "").strip().rstrip("/").split("@", 1)[0].lower()
+    if not root:
+        raise Step("/v1/models must expose a non-empty root for model provenance")
+    if root != declared:
+        raise Step(f"/v1/models root {ready.get('root')!r} does not match declared model {contract['submission']['model']!r}")
+
+
+def canary_evidence(cfg, tokenizer, at_rest, under_load):
+    pairs = [(at_rest[i], text) for level in under_load.values() for i, text in level]
+    sims = [similarity(a, b) for a, b in pairs]
+    lengths = [len(tokenizer.encode(text, add_special_tokens=False)) for _, text in pairs]
+    normalized = [" ".join(text.lower().split()) for _, text in pairs if text.strip()]
+    unique_share = len({hashlib.sha256(x.encode()).hexdigest() for x in normalized}) / len(pairs) if pairs else 0
+    minimum = int(cfg["scoring"]["min_output_share"] * cfg["speed"]["output_tokens"])
+    return {"count": len(pairs),
+            "similarity_mean": round(sum(sims) / len(sims), 3) if sims else None,
+            "similarity_min": round(min(sims), 3) if sims else None,
+            "empty_under_load": sum(1 for _, text in pairs if not text.strip()),
+            "output_tokens_min": min(lengths) if lengths else None,
+            "output_tokens_each": lengths,
+            "output_tokens_required": minimum,
+            "short_outputs": sum(1 for n in lengths if n < minimum),
+            "unique_output_share": round(unique_share, 3)}
+
+
 # ── main ─────────────────────────────────────────────────────────────────────────────────
 def main():
+    import yaml
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--repo", required=True, help="git URL, bare mirror, or a plain local directory")
     ap.add_argument("--ref", default=None, help="commit SHA (from the deadline snapshot) or tag")
@@ -468,51 +626,69 @@ def main():
     seed = int(os.environ.get("JUDGE_SEED", "0"))
     judge_env = dict(os.environ, HF_HOME=os.path.expanduser(cfg["judge_hf_home"]))
     os.environ["HF_HOME"] = judge_env["HF_HOME"]          # datasets/transformers inside this process too
-    res = {"started_at": now(), "config_version": cfg["version"], "steps": {}, "ok": False, "judge_error": False}
-    server, t0 = None, time.time()
+    res = {"started_at": now(), "config_version": cfg["version"], "provenance": provenance(a.config),
+           "steps": {}, "ok": False, "judge_error": False}
+    res["provenance"]["speed_assets"] = {
+        "tokenizer": cfg["speed"]["tokenizer"], "tokenizer_revision": cfg["speed"]["tokenizer_revision"],
+        "corpus": cfg["speed"]["corpus"]}
+    server, t0, deadline = None, time.time(), Deadline(cfg["budget_s"])
+    cache_dir = pathlib.Path(tempfile.mkdtemp(prefix="lsm-submission-hf-"))
+    runtime_dir = pathlib.Path(tempfile.mkdtemp(prefix="lsm-submission-runtime-"))
 
-    def budget():
-        if time.time() - t0 > cfg["budget_s"]:
-            raise Step(f"over the per-submission time budget of {cfg['budget_s']} s")
+    def budget_alarm(_signum, _frame):
+        raise Step(f"over the per-submission time budget of {cfg['budget_s']} s")
+
+    if hasattr(signal, "setitimer"):
+        signal.signal(signal.SIGALRM, budget_alarm)
+        signal.setitimer(signal.ITIMER_REAL, cfg["budget_s"])
 
     try:
         src = out / "src"
-        res["steps"]["fetch"] = fetch(a.repo, a.ref, src)
+        if a.sandbox == "docker":
+            marker = cfg["server"].get("egress_block_confirmation_env")
+            if marker and os.environ.get(marker) != "1":
+                raise JudgeError(f"verify the internal measurement network and set {marker}=1 before sandboxed runs")
+            res["steps"]["egress"] = verify_docker_egress_blocked(cfg, deadline)
+        res["steps"]["fetch"] = fetch(a.repo, a.ref, src, deadline)
         res["steps"]["contract"] = c = check_contract(src, cfg)
         if not c["ok"]:
             raise Step("contract: " + "; ".join(c["errors"]))
-        if not wait_gpu_idle(cfg):
+        if not wait_gpu_idle(cfg, deadline=deadline):
             raise JudgeError("GPU is busy before start — judge problem, not yours; the run will be repeated")
         if not port_free(cfg["server"]["port"]):
             raise JudgeError(f"port {cfg['server']['port']} is busy before start — judge problem; rerun")
         res["steps"]["gpu"] = gpu_info()
-        canaries = [] if a.skip_speed else build_prompts(cfg, seed, out / "prompts.jsonl")
-        server = start_server(src, cfg, out, out.name, a.sandbox)
-        res["steps"]["start"] = {"mode": server["mode"], **wait_ready(server, cfg)}
-        res["steps"]["smoke"] = smoke(cfg)
-        at_rest = [stream_chat(speed_body(cfg, p), cfg["server"]["port"], 300)[0] for p in canaries]
-        errors = []  # quality and speed are independent: a failure in one must not hide the other
         if not a.skip_quality:
-            budget()
+            res["provenance"]["quality_datasets"] = prepare_quality_datasets(cfg, deadline)
+        canaries, tokenizer = ([], None) if a.skip_speed else build_prompts(cfg, seed, out / "prompts.jsonl")
+        judge_env.update(HF_DATASETS_OFFLINE="1", HF_HUB_OFFLINE="1")
+        server = start_server(src, cfg, out, out.name, a.sandbox, cache_dir, runtime_dir, deadline,
+                              c["submission"])
+        ready = wait_ready(server, cfg, deadline)
+        verify_model_identity(c, ready)
+        res["steps"]["start"] = {"mode": server["mode"], **ready,
+                                   "declared_revision": c["submission"]["model_revision"]}
+        res["steps"]["smoke"] = smoke(cfg, deadline)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, len(canaries))) as pool:
+            futures = [pool.submit(stream_chat, speed_body(cfg, p), cfg["server"]["port"],
+                                   deadline.timeout(300, "at-rest canaries")) for p in canaries]
+            at_rest = [f.result()[0] for f in futures]
+        errors = []  # quality and speed are independent: a failure in one must not hide the other
+        phases = (["quality"] if not a.skip_quality else []) + (["speed"] if not a.skip_speed else [])
+        random.Random(f"{seed}:phase-order").shuffle(phases)
+        res["steps"]["phase_order"] = phases
+        for phase in phases:
+            deadline.check(phase)
             try:
-                res["steps"]["quality"] = run_quality(cfg, out, seed, judge_env)
+                if phase == "quality":
+                    res["steps"]["quality"] = run_quality(cfg, out, seed, judge_env, deadline)
+                else:
+                    levels, under_load = run_speed(cfg, out, seed, out / "prompts.jsonl", canaries, judge_env,
+                                                   deadline)
+                    res["steps"]["speed"] = levels
+                    res["steps"]["canary"] = canary_evidence(cfg, tokenizer, at_rest, under_load)
             except Step as e:
-                errors.append(f"quality: {e}")
-        if not a.skip_speed:
-            budget()
-            try:
-                levels, under_load = run_speed(cfg, out, seed, out / "prompts.jsonl", canaries, judge_env)
-                pairs = [(at_rest[i], t) for lvl in under_load.values() for i, t in lvl]
-                sims = [similarity(x, y) for x, y in pairs]
-                res["steps"]["speed"] = levels
-                res["steps"]["canary"] = {
-                    "count": len(sims),
-                    "similarity_mean": round(sum(sims) / len(sims), 3) if sims else None,
-                    "similarity_min": round(min(sims), 3) if sims else None,
-                    "empty_under_load": sum(1 for _, y in pairs if not y.strip()),
-                }
-            except Step as e:
-                errors.append(f"speed: {e}")
+                errors.append(f"{phase}: {e}")
         if errors:
             raise Step("; ".join(errors))
         res["ok"] = True
@@ -523,12 +699,15 @@ def main():
     except Exception as e:  # a crash in this script must never look like a student failure
         res["error"], res["judge_error"] = f"JUDGE ERROR {type(e).__name__}: {e}", True
     finally:
+        if hasattr(signal, "setitimer"):
+            signal.setitimer(signal.ITIMER_REAL, 0)
         stop_server(server, cfg)
         if server and not (wait_gpu_idle(cfg, kill=True) and port_free(cfg["server"]["port"])):
             res.setdefault("warnings", []).append("GPU or port still busy after stop — the next run will detect it")
         res["finished_at"] = now()
         res["elapsed_s"] = round(time.time() - t0, 1)
         (out / "prompts.jsonl").unlink(missing_ok=True)     # the secret prompts never outlive the run
+        cleanup_submission_state(cfg, cache_dir, runtime_dir)  # no state is shared between submissions
         json.dump(res, open(out / "result.json", "w"), indent=2)
     print(json.dumps({k: res[k] for k in ("ok", "judge_error", "error") if k in res}))
     return 0 if res["ok"] else (2 if res["judge_error"] else 1)

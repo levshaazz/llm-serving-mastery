@@ -21,10 +21,10 @@
       "en": "ML / LLM engineers, MLOps, DevOps and backend engineers"
     },
     "format": {
-      "en": "15 topics · lectures + hands-on seminars (topics 10–12: lecture and live demo only, for now)"
+      "en": "15 topics · lectures + hands-on seminars · multi-GPU and Kubernetes labs included when the infrastructure block begins"
     },
     "workload": {
-      "en": "≈ 10–14 hours per week, ≈ 150–200 hours in total"
+      "en": "Baseline ≈ 10–14 hours per week; advanced and leaderboard track ≈ 16–20 hours. Material that does not fit the contact session remains required guided self-study; expect ≈ 180–300 hours in total."
     },
     "repo": "https://github.com/levshaazz/llm-serving-mastery",
     "site": "https://levshaazz.github.io/llm-serving-mastery/"
@@ -259,10 +259,10 @@
         "en": "Multi-GPU inference: tensor parallelism"
       },
       "seminar": {
-        "en": "No hands-on seminar for now — lecture with a live demo"
+        "en": "Run and compare tensor-parallel and data-parallel configurations on 2 and 4 GPUs"
       },
       "milestone": {
-        "en": "— (covered on the exam)"
+        "en": "Scaling-efficiency report with communication and memory analysis"
       }
     },
     {
@@ -272,10 +272,10 @@
         "en": "Kubernetes for LLM serving: GPU Operator & Helm"
       },
       "seminar": {
-        "en": "No hands-on seminar for now — lecture with a live demo"
+        "en": "Deploy a GPU workload with NVIDIA GPU Operator and a versioned Helm release"
       },
       "milestone": {
-        "en": "— (covered on the exam)"
+        "en": "Reproducible cluster deployment and rollback runbook"
       }
     },
     {
@@ -285,10 +285,10 @@
         "en": "Advanced Kubernetes: single-pod concurrency & HPA"
       },
       "seminar": {
-        "en": "No hands-on seminar for now — lecture with a live demo"
+        "en": "Deploy a multi-GPU pod, scale replicas on serving metrics, and run a failure drill"
       },
       "milestone": {
-        "en": "— (covered on the exam)"
+        "en": "HPA experiment, capacity model and incident notes"
       }
     },
     {
@@ -331,6 +331,23 @@
       }
     }
   ],
+  "studyPlan": [
+    {"n": 1, "core": {"en": "Serving lifecycle, prefill/decode, SLOs, capacity and the course measurement contract."}, "required": {"en": "Set up uv, Git, Colab GPU and the submission repository; reproduce the baseline run."}, "deepDive": {"en": "Trace one OpenAI-compatible streaming request end to end and document every boundary."}},
+    {"n": 2, "core": {"en": "Autoregression, KV-cache sizing, memory hierarchy, roofline reasoning and profiler literacy."}, "required": {"en": "Profile prefill and decode separately; reconcile measured memory and latency with a hand calculation."}, "deepDive": {"en": "Build a small roofline model and test where batch size changes the active bottleneck."}},
+    {"n": 3, "core": {"en": "Weight and activation formats, calibration, weight-only vs weight-activation quantization, quality risk."}, "required": {"en": "Quantize one model, benchmark memory/speed/quality, and explain hardware-specific kernel support."}, "deepDive": {"en": "Compare AWQ/GPTQ/FP8/NVFP4 assumptions and reproduce one surprising regression."}},
+    {"n": 4, "core": {"en": "vLLM engine architecture, scheduler, OpenAI protocol, streaming and production configuration surfaces."}, "required": {"en": "Launch a pinned vLLM service and validate protocol, model metadata, streaming and failure responses."}, "deepDive": {"en": "Map API parameters to engine behavior and identify parameters the backend ignores or rewrites."}},
+    {"n": 5, "core": {"en": "PagedAttention, block allocation, fragmentation, continuous batching and scheduler trade-offs."}, "required": {"en": "Compare pipeline and vLLM under controlled prompts, outputs and concurrency; explain the gap."}, "deepDive": {"en": "Instrument block pressure and relate queueing events to KV-cache occupancy."}},
+    {"n": 6, "core": {"en": "Load models, open vs closed loop traffic, throughput/TTFT/TPOT tails, backpressure and saturation."}, "required": {"en": "Run 8/32/64/128-client experiments with warm-up, errors and confidence-aware interpretation."}, "deepDive": {"en": "Design an arrival process that resembles a real product and compare it with fixed concurrency."}},
+    {"n": 7, "core": {"en": "Parameter interactions: max_num_seqs, batched tokens, memory utilization, chunked prefill and prefix caching."}, "required": {"en": "Perform a bounded search, keep raw results, and choose a configuration for an explicit SLO."}, "deepDive": {"en": "Model the Pareto frontier and explain why the fastest point is not always the production point."}},
+    {"n": 8, "core": {"en": "API contracts, cancellation, timeouts, admission control, quotas, validation, streaming and observability."}, "required": {"en": "Build a thin FastAPI gateway with request IDs, bounded queues, error mapping and streaming cancellation."}, "deepDive": {"en": "Threat-model abuse, prompt size, disconnects and retry storms; test at least two failure modes."}},
+    {"n": 9, "core": {"en": "GPU container runtime, image layers, immutable dependencies, model artifacts, security and startup economics."}, "required": {"en": "Produce a lean pinned image, run it with GPU isolation and record cold/warm startup behavior."}, "deepDive": {"en": "Create an SBOM and evaluate cache, driver and CUDA compatibility failure scenarios."}},
+    {"n": 10, "core": {"en": "Tensor/pipeline/data parallelism, collectives, topology, communication cost and scaling efficiency."}, "required": {"en": "Run 2- and 4-GPU configurations and explain throughput, latency, memory and interconnect effects."}, "deepDive": {"en": "Predict the useful scaling limit for two model sizes before measuring it."}},
+    {"n": 11, "core": {"en": "Kubernetes GPU scheduling, device plugins, GPU Operator, Helm releases, storage and rollout safety."}, "required": {"en": "Install or use the provided cluster, deploy a pinned chart, observe scheduling and perform rollback."}, "deepDive": {"en": "Diagnose one deliberately broken driver, resource or readiness configuration."}},
+    {"n": 12, "core": {"en": "Multi-GPU pods, replicas, topology constraints, autoscaling signals, disruption and graceful draining."}, "required": {"en": "Scale on serving metrics, test a node/pod failure and compare observed recovery with the capacity model."}, "deepDive": {"en": "Evaluate HPA stability under bursty traffic and propose safeguards against oscillation."}},
+    {"n": 13, "core": {"en": "Golden signals for LLM serving, GPU/engine metrics, traces, alerts, SLO burn rates and token economics."}, "required": {"en": "Build dashboards and alerts that separate demand, queueing, model work and infrastructure failure."}, "deepDive": {"en": "Calculate cost per million useful tokens and identify the largest uncertainty in the estimate."}},
+    {"n": 14, "core": {"en": "LoRA/QLoRA artifacts, adapter loading, multiplexing, isolation, batching effects and quality validation."}, "required": {"en": "Serve multiple adapters over one base model and measure switching, memory and mixed-traffic behavior."}, "deepDive": {"en": "Design an adapter lifecycle with provenance, rollout and rollback guarantees."}},
+    {"n": 15, "core": {"en": "Architecture review, capacity/cost trade-offs, reliability patterns, evaluation drift and emerging serving paths."}, "required": {"en": "Defend the full engineering story with reproducible evidence, limitations and an incident-ready runbook."}, "deepDive": {"en": "Write a six-month improvement roadmap with decision triggers rather than trend predictions."}}
+  ],
   "leaderboard": {
     "rounds": 10,
     "judge": {
@@ -352,13 +369,19 @@
       {
         "file": "submission.yaml",
         "role": {
-          "en": "author, model (Hugging Face id), stack — printed on the board"
+          "en": "author, model (Hugging Face id), immutable model revision, stack — recorded for audit and printed on the board"
+        }
+      },
+      {
+        "file": "prepare.sh",
+        "role": {
+          "en": "networked bootstrap only: install the locked environment and fetch the declared immutable model revision; it receives no judge seed or prompts"
         }
       },
       {
         "file": "serve.sh",
         "role": {
-          "en": "from a clean checkout: install the pinned environment and start an OpenAI-compatible server on 0.0.0.0:8000, model name \"submission\", streaming /v1/chat/completions that honours max_tokens and ignore_eos and accepts requests of up to 4096 tokens (prompt + answer)"
+          "en": "offline measurement phase: start an OpenAI-compatible server on 0.0.0.0:8000 from the prepared runtime/cache, model name \"submission\", streaming /v1/chat/completions that honours max_tokens and ignore_eos and accepts requests of up to 4096 tokens"
         }
       },
       {
@@ -376,12 +399,12 @@
       {
         "file": "Dockerfile",
         "role": {
-          "en": "optional — if present, the judge builds and runs it instead of serve.sh (must expose port 8000)"
+          "en": "optional alternative — if present, the build must bake in dependencies and model artifacts; the judge runs it offline instead of prepare.sh + serve.sh"
         }
       }
     ],
     "speed": {
-      "en": "Speed score S = geometric mean of output tokens/s at 32 and at 64 concurrent clients (GuideLLM · synthetic 512-token prompts → 256-token answers · prompts drawn with a secret seed)."
+      "en": "Speed score S = geometric mean of output tokens/s at 32 and at 64 concurrent clients (GuideLLM · natural-text prompts of about 512 tokens · up to 256 generated tokens · prompts drawn with a secret seed)."
     },
     "quality": {
       "en": "Quality gate: subsets of GSM8K, MMLU-Pro and IFEval through lm-eval against your endpoint. Each score must be ≥ 90% of the reference submission's score."
@@ -402,16 +425,16 @@
       "en": "Every round closes on Thursday at 23:59 Moscow time (MSK, UTC+3)."
     },
     "latency": {
-      "en": "Latency gate: p95 time-to-first-token at 64 clients must not exceed the round's SLO (reference p95 × 1.25). Errors ≤ 1%, and answers must really be 256 tokens long."
+      "en": "Latency gate: p95 time-to-first-token among successful requests at 64 clients must not exceed the round's SLO (reference p95 × 1.25). Errors ≤ 1%. Every hidden length probe must produce at least 95% of the requested 256 tokens; an average cannot hide short answers."
     },
     "thresholds": {
-      "en": "The quality gates, the speed bar S_bar and the latency SLO are re-published every week, before the round opens. Round 1 bars come from the reference submission (Qwen2.5-3B-Instruct on vLLM) measured on Colab T4."
+      "en": "The quality gates, speed bar S_bar and latency SLO are published before a round opens from a fresh, provenance-complete reference run using the same judge version. Legacy reconstructed bars are explicitly marked provisional and are not valid for grading."
     },
     "dryRun": {
       "en": "Every Tuesday the judge dry-runs the current default branch of every repository (contract, start-up, smoke test on the RTX 5070 Ti) and publishes the logs — so you can see your submission start on Blackwell before Thursday."
     },
     "canaryRule": {
-      "en": "Same-model check: hidden canary prompts are answered at rest and again under load; the answers must match (similarity ≥ 0.5). Serving a different model under load fails the round."
+      "en": "Layered same-model check: hidden canaries are answered at rest and under load; every pair must meet the published similarity floor, outputs must meet the per-request length floor, and diverse prompts must not collapse to one canned answer. Model metadata and pinned revision are recorded for audit."
     }
   },
   "assessment": {
@@ -473,13 +496,30 @@
   "lectures": [
     {
       "id": "00",
+      "topic": 0,
       "status": "ready",
       "deckFile": "Lectures/00-introduction.html",
+      "notebook": "seminars/00-live-demo-pipeline-vs-vllm.ipynb",
+      "colab": "https://colab.research.google.com/github/levshaazz/llm-serving-mastery/blob/main/seminars/00-live-demo-pipeline-vs-vllm.ipynb",
       "title": {
         "en": "Introduction: the kitchen at rush hour"
       },
       "blurb": {
         "en": "Course overview, the leaderboard, grading — and a live demo of why a naive pipeline dies at 64 clients."
+      }
+    },
+    {
+      "id": "01",
+      "topic": 1,
+      "status": "ready",
+      "deckFile": "Lectures/01-modern-inference-systems.html",
+      "notebook": "seminars/01-serving-system-baseline.ipynb",
+      "colab": "https://colab.research.google.com/github/levshaazz/llm-serving-mastery/blob/main/seminars/01-serving-system-baseline.ipynb",
+      "title": {
+        "en": "Modern LLM inference systems & production challenges"
+      },
+      "blurb": {
+        "en": "Request lifecycle, prefill/decode, production objectives, overload and a reproducible single-GPU baseline."
       }
     }
   ],
@@ -501,6 +541,13 @@
       "publisher": "OSDI",
       "year": 2022,
       "url": "https://www.usenix.org/conference/osdi22/presentation/yu"
+    },
+    {
+      "author": "Dean and Barroso",
+      "title": "The Tail at Scale",
+      "publisher": "Communications of the ACM",
+      "year": 2013,
+      "url": "https://research.google/pubs/the-tail-at-scale/"
     },
     {
       "author": "Dao et al.",

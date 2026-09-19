@@ -1,7 +1,7 @@
 <section class="slide" data-type="two-col" data-screen-label="13b 16 GB, budgeted">
           <div class="slide-header">
             <h2><span lang="en">16 GB of VRAM, budgeted</span></h2>
-            <span class="slide-kicker"><span lang="en">Batching is free in bandwidth — not in memory</span></span>
+            <span class="slide-kicker"><span lang="en">Batching amortizes weight traffic — but consumes compute and memory</span></span>
           </div>
           <div class="twocol">
             <div class="twocol-col">
@@ -32,7 +32,7 @@
               </div>
             </div>
           </div>
-          <aside class="slide-notes">6·10⁹ / 147 456 ≈ 40 700 tokens in total, ≈ 636 per request at 64 concurrent requests — prompt plus answer. That is why the leaderboard rule is stated in tokens: 64 concurrent requests × (512 prompt + 256 answer) ≈ 49k tokens of KV cache next to the weights, in 16 GB. The 4B-in-BF16 example on this slide does not fit it — a first hint that quantization (topic 3) is not optional on the judge. The ~2 GB runtime figure is a rough allowance (CUDA context, activations, CUDA graphs), not a constant.</aside>
+          <aside class="slide-notes">6·10⁹ / 147 456 ≈ 40 700 tokens in total, ≈ 636 per request at 64 concurrent requests — prompt plus answer. That is why the leaderboard rule is stated in tokens: 64 concurrent requests × (512 prompt + 256 answer) ≈ 49k tokens of KV cache next to the weights, in 16 GB. This particular 4B-in-BF16, 8-KV-head example does not fit. That is model-specific, not a proof that quantization is mandatory: a grouped-query model such as Qwen2.5-3B with 2 KV heads needs only about 36 KiB per token in BF16, so roughly 49k tokens consume about 1.7 GiB of KV cache. Topic 3 treats quantization as one trade-off among model architecture, context, batching and runtime overhead. The ~2 GB runtime figure is a rough allowance (CUDA context, activations, CUDA graphs), not a constant.</aside>
         </section>
 
         <!-- ============================================ ART-HERO · the big wok ============================================ -->

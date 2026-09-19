@@ -1,5 +1,7 @@
 {
   "round": 1,
+  "verified": false,
+  "status": "provisional-not-for-grading",
   "note": "Reference submission (Qwen2.5-3B-Instruct, vLLM 0.29, FP16) on Colab T4, 2026-09-19",
   "reference": {
     "gpu": "Tesla T4",

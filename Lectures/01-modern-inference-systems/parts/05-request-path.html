@@ -1,0 +1,13 @@
+<section class="slide" data-type="process" data-screen-label="05 Request path">
+  <div class="slide-header"><h2><span lang="en">One request crosses several ownership boundaries</span></h2><span class="slide-kicker"><span lang="en">Data path</span></span></div>
+  <div class="flow-row">
+    <div class="flow-step"><strong><span lang="en">Client</span></strong><br><span lang="en">deadline · retry</span></div>
+    <div class="flow-arrow">→</div><div class="flow-step"><strong><span lang="en">Gateway</span></strong><br><span lang="en">auth · limits</span></div>
+    <div class="flow-arrow">→</div><div class="flow-step"><strong><span lang="en">Router</span></strong><br><span lang="en">placement</span></div>
+    <div class="flow-arrow">→</div><div class="flow-step"><strong><span lang="en">Engine</span></strong><br><span lang="en">queue · schedule</span></div>
+    <div class="flow-arrow">→</div><div class="flow-step"><strong><span lang="en">GPU</span></strong><br><span lang="en">prefill · decode</span></div>
+  </div>
+  <p class="lead"><span lang="en">The response returns incrementally; cancellation and errors must travel in both directions.</span></p>
+  <aside class="slide-notes">Clarify that real products may merge or split these boxes. The conceptual boundaries still matter because they have different owners and failure modes. Ask where a request ID should be created and propagated.</aside>
+</section>
+

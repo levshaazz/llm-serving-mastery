@@ -1,0 +1,14 @@
+<section class="slide" data-type="timeline" data-screen-label="09 Streaming timeline">
+  <div class="slide-header"><h2><span lang="en">Streaming changes perception, not the work already done</span></h2><span class="slide-kicker"><span lang="en">Timeline</span></span></div>
+  <div class="timeline">
+    <div class="timeline-item"><strong><span lang="en">Accept</span></strong><span lang="en">validate + enqueue</span></div>
+    <div class="timeline-item"><strong><span lang="en">Wait</span></strong><span lang="en">queue + schedule</span></div>
+    <div class="timeline-item"><strong><span lang="en">Prefill</span></strong><span lang="en">prompt processing</span></div>
+    <div class="timeline-item"><strong><span lang="en">First token</span></strong><span lang="en">TTFT boundary</span></div>
+    <div class="timeline-item"><strong><span lang="en">Decode</span></strong><span lang="en">token cadence</span></div>
+    <div class="timeline-item"><strong><span lang="en">Finish</span></strong><span lang="en">E2E boundary</span></div>
+  </div>
+  <p class="lead"><span lang="en">A fast first token can coexist with a slow completion; a low average can hide a bad tail.</span></p>
+  <aside class="slide-notes">Define the client-observed clock. Server-only timing omits network and parsing; that can be useful, but must be labeled. Streaming is also a protocol commitment: chunk format, finish reason, disconnect behavior.</aside>
+</section>
+

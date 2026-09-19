@@ -1,7 +1,7 @@
 <section class="slide" data-type="two-col" data-screen-label="29b Round 1 bars">
           <div class="slide-header">
-            <h2><span lang="en">Round 1 bars</span></h2>
-            <span class="slide-kicker"><span lang="en">Re-published every week, before the round opens</span></span>
+            <h2><span lang="en">Round 1 calibration — provisional</span></h2>
+            <span class="slide-kicker"><span lang="en">Not valid for grading until the v3 reference rerun</span></span>
           </div>
           <div class="twocol">
             <div class="twocol-col">
@@ -20,21 +20,21 @@
               <div class="callout" data-kind="info">
                 <div class="callout-icon">i</div>
                 <div class="callout-body">
-                  <strong><span lang="en">Where they come from</span></strong>
-                  <p><span lang="en">The reference submission — Qwen2.5-3B-Instruct on plain vLLM — put through the judge on a <strong>Colab T4</strong>. Quality gates are 90% of its scores; the SLO is its p95 TTFT × 1.25.</span></p>
+                  <strong><span lang="en">Historical calibration only</span></strong>
+                  <p><span lang="en">These values were reconstructed from a lost Colab run and lack complete provenance. They illustrate the calculation, but cannot grade a round.</span></p>
                 </div>
               </div>
               <div class="callout" data-kind="warn" style="margin-top:var(--sp-3)">
                 <div class="callout-icon">!</div>
                 <div class="callout-body">
-                  <strong><span lang="en">They move every week</span></strong>
-                  <p><span lang="en">Gates, \(S_{\text{bar}}\) and the SLO are updated and published on the leaderboard page before each round opens. Last week's 5 / 5 is not this week's.</span></p>
+                  <strong><span lang="en">Required before opening</span></strong>
+                  <p><span lang="en">Run the reference through judge config v3, preserve raw artifacts, then publish verified gates, \(S_{\text{bar}}\) and the SLO.</span></p>
                 </div>
               </div>
             </div>
           </div>
-          <aside class="slide-notes">Round 1 is deliberately reachable: the bar was measured on a T4, and the judge's RTX 5070 Ti has about 2.8× its memory bandwidth, so the reference submission should clear it there with room to spare. Getting a working, reproducible server through the contract is the real task of week 1. From round 2 the bars are re-set every week and published with the round; the source of each week's bars is written next to them on the leaderboard page. Numbers: judge/thresholds/round-01.json.</aside>
+          <aside class="slide-notes">Do not present these numbers as active grading thresholds. The original result.json was reconstructed from console output after the Colab VM was lost. Judge v3 now refuses to generate thresholds from a provenance-incomplete reference. Rerun Qwen2.5-3B-Instruct through the same clean v3 pipeline on the declared reference hardware, preserve raw artifacts, and only then replace this provisional table. Numbers retained for historical comparison: judge/thresholds/round-01.json.</aside>
         </section>
 
         <!-- ============================================ -->
-        
+

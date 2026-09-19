@@ -11,6 +11,7 @@ const { lang } = Astro.params;
 const m = course.meta;
 const cover = withBase('/Lectures/assets/img/L0/L0-01-rush-hour.webp');
 const blockTitle = Object.fromEntries(course.blocks.map((b) => [b.id, b.title]));
+const publishedTopics = new Set(course.lectures.map((lecture) => lecture.topic).filter((n) => Number.isInteger(n)));
 ---
 <BaseLayout lang={lang} page="">
   <div class="cover-banner">
@@ -45,11 +46,11 @@ const blockTitle = Object.fromEntries(course.blocks.map((b) => [b.id, b.title]))
             <p>{t(lec.blurb, lang)}</p>
             <div class="links">
               {lec.deckFile && <a href={withBase('/' + lec.deckFile)}>{t(ui.labels.openSlides, lang)} →</a>}
-              {lec.id === '00' && <a href={course.demo.colab}>{t(ui.labels.openColab, lang)}</a>}
+              {lec.colab && <a href={lec.colab}>{t(ui.labels.openColab, lang)}</a>}
             </div>
           </div>
         ))}
-        {course.topics.map((tp) => (
+        {course.topics.filter((tp) => !publishedTopics.has(tp.n)).map((tp) => (
           <div class="card soon">
             <span class="tag soon">{t(ui.labels.coming, lang)}</span>
             <div class="num">{t(ui.labels.topic, lang)} {tp.n} · {t(blockTitle[tp.block], lang)}</div>

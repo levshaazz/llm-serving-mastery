@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run_round.sh — measure every snapshotted submission of a round, one after another, then score and publish.
-#   JUDGE_SEED=<secret> judge/run_round.sh 1
+#   JUDGE_SEED=<secret> JUDGE_EGRESS_BLOCKED=1 judge/run_round.sh 1
 # Needs: judge/rounds/round-NN/snapshot.json (judge/snapshot.py at the deadline)
 #        judge/thresholds/round-NN.json      (published before the round opened)
 # Private (gitignored): judge/rounds/.  Public (committed): data/leaderboard/round-NN.json and
@@ -11,8 +11,12 @@ N=$(printf "%02d" "$1")
 DIR=judge/rounds/round-$N
 PUB=data/leaderboard/round-$N
 : "${JUDGE_SEED:?set JUDGE_SEED (secret, not in git; a new one every round)}"
+: "${JUDGE_EGRESS_BLOCKED:?verify the internal measurement network, then set JUDGE_EGRESS_BLOCKED=1}"
 [ -f "$DIR/snapshot.json" ] || { echo "no $DIR/snapshot.json — run judge/snapshot.py at the deadline"; exit 1; }
 [ -f "judge/thresholds/round-$N.json" ] || { echo "no judge/thresholds/round-$N.json"; exit 1; }
+python3 -c 'import json,sys; p=json.load(open(sys.argv[1]));
+assert p.get("verified") is True, "thresholds are provisional/unverified — rerun the reference before grading"' \
+  "judge/thresholds/round-$N.json"
 
 # the list is read from a file descriptor the submissions cannot touch (their stdin is /dev/null)
 exec 3< <(python3 -c '
@@ -29,11 +33,17 @@ while IFS=$'\x1f' read -r who mirror sha err <&3; do
       "error": f"no submission at the deadline: {sys.argv[2]}"}, open(sys.argv[1], "w"))' "$out/result.json" "$err"
     continue
   fi
+  selected=""
   for attempt in 1 2; do                      # a judge error (GPU busy, crash) is retried once, never scored
     echo "=== $who @ $sha (attempt $attempt)"
-    rc=0; python3 judge/run_submission.py --repo "$mirror" --ref "$sha" --out "$out" --sandbox docker </dev/null || rc=$?
+    attempt_out="$out/attempt-$attempt"
+    rc=0; python3 judge/run_submission.py --repo "$mirror" --ref "$sha" --out "$attempt_out" --sandbox docker </dev/null || rc=$?
+    selected="$attempt_out"
     [ "$rc" -eq 2 ] || break
   done
+  # Keep every raw attempt privately. The selected/final attempt is copied to the stable path used by score.py.
+  cp "$selected/result.json" "$out/result.json"
+  for f in "$selected"/*.log; do [ -f "$f" ] && cp "$f" "$out/"; done
 done
 exec 3<&-
 

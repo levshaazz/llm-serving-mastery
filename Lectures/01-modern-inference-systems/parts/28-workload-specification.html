@@ -1,0 +1,12 @@
+<section class="slide" data-type="table" data-screen-label="28 Workload specification">
+  <div class="slide-header"><h2><span lang="en">A benchmark begins with a workload specification</span></h2><span class="slide-kicker"><span lang="en">Required fields</span></span></div>
+  <table><tbody>
+    <tr><th><span lang="en">Artifacts</span></th><td><span lang="en">model revision, tokenizer, chat template, runtime versions</span></td></tr>
+    <tr><th><span lang="en">Inputs</span></th><td><span lang="en">dataset/source, prompt-token distribution, request parameters</span></td></tr>
+    <tr><th><span lang="en">Outputs</span></th><td><span lang="en">cap or distribution, stop conditions, deterministic settings</span></td></tr>
+    <tr><th><span lang="en">Load</span></th><td><span lang="en">open/closed loop, arrival rate or concurrency, duration, warm-up</span></td></tr>
+    <tr><th><span lang="en">Success</span></th><td><span lang="en">TTFT/TPOT/E2E percentiles, throughput, errors and explicit SLO</span></td></tr>
+  </tbody></table>
+  <aside class="slide-notes">If one field is absent, another engineer may reproduce the code but not the experiment. Token distributions are more portable than character counts.</aside>
+</section>
+

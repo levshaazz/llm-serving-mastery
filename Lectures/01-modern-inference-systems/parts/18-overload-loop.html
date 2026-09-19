@@ -1,0 +1,12 @@
+<section class="slide" data-type="process" data-screen-label="18 Overload loop">
+  <div class="slide-header"><h2><span lang="en">Uncontrolled retries turn overload into a feedback loop</span></h2><span class="slide-kicker"><span lang="en">Backpressure</span></span></div>
+  <div class="flow-row">
+    <div class="flow-step"><span lang="en">Demand spike</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step"><span lang="en">Queue grows</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step"><span lang="en">Timeouts</span></div><div class="flow-arrow">→</div>
+    <div class="flow-step"><span lang="en">Retries</span></div><div class="flow-arrow">↺</div>
+  </div>
+  <div class="callout"><strong><span lang="en">Controls:</span></strong> <span lang="en">bounded queues, admission control, deadlines, cancellation, retry budgets and jitter.</span></div>
+  <aside class="slide-notes">Make the distinction between rejecting early and failing late. Admission control preserves useful capacity. Retry policies belong to the end-to-end system; a server alone cannot prevent all retry amplification.</aside>
+</section>
+

@@ -3,15 +3,19 @@ import math, pathlib, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from score import score_round, speed_score  # noqa: E402
+from run_submission import canary_evidence, parse_guidellm  # noqa: E402
 
 TH = {"quality_gates": {"gsm8k": 0.5, "ifeval": 0.5, "mmlu_pro": 0.3},
       "speed_bar_S": 1000.0, "ttft_p95_slo_s": 2.0, "max_error_rate": 0.01, "min_output_share": 0.95,
-      "canary_min_similarity": 0.5}
+      "canary_min_similarity": 0.5, "canary_similarity_stat": "min", "canary_max_short_outputs": 0,
+      "canary_min_unique_share": 0.75}
 
 
-def result(t32, t64, ttft=1.0, q=(0.6, 0.6, 0.4), failed=0, ok=True, out_len=256, canary=0.95, judge_error=False):
+def result(t32, t64, ttft=1.0, q=(0.6, 0.6, 0.4), failed=0, ok=True, out_len=256, canary=0.95,
+           short=0, unique=1.0, judge_error=False):
     return {"ok": ok, "judge_error": judge_error, "error": None if ok else "boom", "steps": {
-        "canary": {"similarity_mean": canary},
+        "canary": {"similarity_mean": canary, "similarity_min": canary, "short_outputs": short,
+                   "unique_output_share": unique},
         "quality": dict(zip(("gsm8k", "ifeval", "mmlu_pro"), q)),
         "speed": {"32": {"output_tok_s": t32, "ttft_p95_s": 0.5, "requests_ok": 256 - failed, "requests_failed": failed,
                          "output_tokens_mean": out_len, "output_tokens_expected": 256},
@@ -39,9 +43,10 @@ def test_each_gate_zeroes_the_round():
              latency=result(2000, 2000, ttft=2.5),
              errors=result(2000, 2000, failed=10),
              crashed=result(2000, 2000, ok=False),
-             short=result(4000, 4000, out_len=120),
-             swapped=result(4000, 4000, canary=0.1))
-    for k in ("quality", "latency", "errors", "crashed", "short", "swapped"):
+             short=result(4000, 4000, out_len=120, short=1),
+             swapped=result(4000, 4000, canary=0.1),
+             canned=result(4000, 4000, unique=0.1))
+    for k in ("quality", "latency", "errors", "crashed", "short", "swapped", "canned"):
         assert r[k]["mark"] == 0 and not r[k]["passed"] and r[k]["reasons"], k
 
 
@@ -76,6 +81,30 @@ def test_small_class_still_gets_a_band_and_ties_share():
     r = rows(a=result(2000, 2000), b=result(2000, 2000), c=result(1500, 1500))
     assert r["a"]["overdrive"] == r["b"]["overdrive"] == 2 and r["a"]["rank"] == r["b"]["rank"] == 1
     assert r["c"]["overdrive"] == 1 and r["c"]["rank"] == 3
+
+
+def test_guidellm_parser_uses_successful_request_metrics():
+    report = {"benchmarks": [{"metrics": {
+        "output_tokens_per_second": {"successful": {"mean": 123.456}},
+        "time_to_first_token_ms": {"successful": {"median": 100, "percentiles": {"p95": 250}}},
+        "time_per_output_token_ms": {"successful": {"median": 7.5}},
+        "output_token_count": {"successful": {"mean": 256}},
+        "request_totals": {"successful": 10, "errored": 1, "incomplete": 2}},
+        "scheduler_metrics": {"measure_start_time": 10, "measure_end_time": 20}}]}
+    got = parse_guidellm(report, 256)
+    assert got["output_tok_s"] == 123.46 and got["ttft_p95_s"] == 0.25
+    assert got["requests_ok"] == 10 and got["requests_failed"] == 3
+
+
+def test_canary_evidence_is_per_request_and_detects_canned_answers():
+    class Words:
+        @staticmethod
+        def encode(text, add_special_tokens=False):
+            return text.split()
+    cfg = {"scoring": {"min_output_share": 0.75}, "speed": {"output_tokens": 4}}
+    got = canary_evidence(cfg, Words(), ["a b c d", "x y z q"], {"32": [(0, "a b"), (1, "a b")]})
+    assert got["short_outputs"] == 2 and got["output_tokens_min"] == 2
+    assert got["unique_output_share"] == 0.5 and got["similarity_min"] < got["similarity_mean"]
 
 
 if __name__ == "__main__":

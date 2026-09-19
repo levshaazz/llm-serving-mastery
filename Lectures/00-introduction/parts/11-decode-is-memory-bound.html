@@ -17,11 +17,11 @@
             </div>
             <div class="var-block">
               <div class="var-symbol">⇒</div>
-              <div class="var-desc"><span lang="en">Batching is <strong>almost free</strong> in decode.<br />A serial server throws it away.</span></div>
+              <div class="var-desc"><span lang="en">Batching is <strong>cheap in weight traffic</strong> during decode.<br />Compute, KV traffic and scheduling still grow.</span></div>
             </div>
           </div>
-          <aside class="slide-notes">Example: a 4B-parameter model in BF16 = 8 GB of weights; the judge GPU (RTX 5070 Ti) has about 896 GB/s of memory bandwidth. To produce one token, the GPU has to stream every weight from memory once: ≈ 9 ms. So a single request is capped near 110 tokens/s — the arithmetic units sit mostly idle, waiting for memory. If 64 requests decode in the same step, the weights are read once and used 64 times: the ceiling goes up ~64×, until you become compute-bound or run out of memory for the KV cache (next slides). This is a lower bound on step time and an upper bound on speed — real numbers are lower. Topic 2 does this properly (roofline, arithmetic intensity).</aside>
+          <aside class="slide-notes">Example: a 4B-parameter model in BF16 = 8 GB of weights; the judge GPU (RTX 5070 Ti) has about 896 GB/s of memory bandwidth. To produce one token, the GPU has to stream every weight from memory once: ≈ 9 ms. So a single request is capped near 110 tokens/s — the arithmetic units sit mostly idle, waiting for memory. If 64 requests decode in the same step, the weight traffic can be amortized across the batch. That does not make batching free: matrix compute, KV-cache reads and writes, scheduling work and memory capacity all grow, and the workload eventually becomes compute-bound or runs out of KV cache. This is a lower bound on step time and an upper bound on speed — real numbers are lower. Topic 2 does this properly (roofline, arithmetic intensity).</aside>
         </section>
 
         <!-- ============================================ MISCONCEPTION · faster GPU ============================================ -->
-        
+

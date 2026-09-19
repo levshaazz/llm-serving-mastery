@@ -1,0 +1,7 @@
+<section class="slide" data-type="quote" data-screen-label="20 Tail latency">
+  <div class="slide-header"><h2><span lang="en">The tail is where shared systems reveal themselves</span></h2><span class="slide-kicker"><span lang="en">Percentiles</span></span></div>
+  <blockquote><span lang="en">Mean latency answers “what happened on average?” p95 and p99 ask “what experience did the unlucky requests receive?”</span></blockquote>
+  <div class="two-col"><div class="panel"><h3><span lang="en">Report</span></h3><p><span lang="en">sample count, p50/p95/p99, failures, cancellations and timeouts</span></p></div><div class="panel"><h3><span lang="en">Do not infer</span></h3><p><span lang="en">a reliable p99 from a tiny sample or from omitted failures</span></p></div></div>
+  <aside class="slide-notes">Percentiles need adequate sample size and a defined population. Failed requests must not disappear from the report. With 20 samples, p99 is essentially the maximum and should not be presented as a stable tail estimate.</aside>
+</section>
+

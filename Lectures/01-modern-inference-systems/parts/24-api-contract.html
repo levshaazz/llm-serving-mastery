@@ -1,0 +1,10 @@
+<section class="slide" data-type="two-col" data-screen-label="24 API contract">
+  <div class="slide-header"><h2><span lang="en">Compatibility is behavior, not just a URL shape</span></h2><span class="slide-kicker"><span lang="en">API boundary</span></span></div>
+  <div class="two-col"><pre class="code-block"><code class="language-json">{
+  "model": "course-model",
+  "messages": [...],
+  "max_tokens": 64,
+  "stream": true
+}</code></pre><div class="panel"><h3><span lang="en">Test behavior</span></h3><p><span lang="en">Schemas, chunks, finish reasons, usage, errors, timeouts and cancellation.</span></p></div></div>
+  <aside class="slide-notes">OpenAI-compatible does not mean every optional parameter or edge case behaves identically. Clients depend on concrete behavior. We will validate this in Topic 4 and build gateway controls in Topic 8.</aside>
+</section>
