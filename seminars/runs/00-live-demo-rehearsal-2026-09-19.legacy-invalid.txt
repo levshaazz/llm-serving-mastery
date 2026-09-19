@@ -1,0 +1,19 @@
+LEGACY / INVALID FOR THE CURRENT METRIC CONTRACT
+This rehearsal folded client timeouts into the latency tail and lacks the
+environment, revision, and raw-request provenance now required by the course.
+It is retained only as an audit artifact. Do not cite these values as results.
+
+pipeline c=  1      21.3 tok/s   TTFT p50   0.11 s  p95   0.11 s   ok 1/1   wall 4 s
+pipeline c=  8      21.3 tok/s   TTFT p50  13.98 s  p95  26.65 s   ok 8/8   wall 32 s
+pipeline c= 32      18.3 tok/s   TTFT p50  60.00 s  p95  60.00 s   ok 13/32   wall 60 s
+pipeline c= 64      19.0 tok/s   TTFT p50  60.00 s  p95  60.00 s   ok 13/64   wall 60 s
+vLLM     c=  1      48.7 tok/s   TTFT p50   0.03 s  p95   0.03 s   ok 1/1   wall 2 s
+vLLM     c=  8     314.7 tok/s   TTFT p50   0.09 s  p95   0.09 s   ok 8/8   wall 2 s
+vLLM     c= 32     921.7 tok/s   TTFT p50   0.21 s  p95   0.21 s   ok 32/32   wall 3 s
+vLLM     c= 64    1459.4 tok/s   TTFT p50   0.27 s  p95   0.32 s   ok 64/64   wall 4 s
+max requests running in one batch during the 64-client wave: 64.0
+clients | pipeline tok/s | vLLM tok/s | speed-up | pipeline p95 TTFT | vLLM p95 TTFT | pipeline failed | vLLM failed
+      1 |           21.3 |       48.7 |     2.3x |            0.11 s |        0.03 s |               0 |           0
+      8 |           21.3 |      314.7 |    14.8x |           26.65 s |        0.09 s |               0 |           0
+     32 |           18.3 |      921.7 |    50.5x |           60.00 s |        0.21 s |              19 |           0
+     64 |           19.0 |     1459.4 |    76.9x |           60.00 s |        0.32 s |              51 |           0

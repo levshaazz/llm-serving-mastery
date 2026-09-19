@@ -8,9 +8,9 @@ judge_hf_home: ~/.cache/lsm-judge-hf-v3     # contains only the immutable revisi
 server:
   port: 8000
   model_name: submission
-  startup_timeout_s: 1800      # dependency install + weight download + engine start-up
+  startup_timeout_s: 1800      # one total budget: prepare/build + engine start + /v1/models readiness
   shutdown_grace_s: 30
-  docker_build_timeout_s: 1800
+  docker_build_timeout_s: 1800 # cap inside the shared startup budget; never grants another 30 minutes
   gpu_idle_mib: 600            # "idle" = at most this much VRAM in use (the judge GPU is headless)
   sandbox_image: ghcr.io/astral-sh/uv@sha256:e31c71ce6acbe3f4b743f6773948428e6255a4eb20295a9d67a703a1c4e5f664  # uv 0.8.22, linux/amd64
   pids_limit: 4096

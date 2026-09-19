@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES } from '../../i18n/locales.js';
+import { portal } from '../../lib/portal.js';
+export function getStaticPaths() { return LOCALES.map((lang) => ({ params: { lang } })); }
+const { lang } = Astro.params;
+---
+<BaseLayout lang={lang} page="provenance" title="Provenance">
+  <div class="wrap"><section class="block"><h1>Provenance and evidence policy</h1><p class="sub">How to decide whether a course claim, benchmark, or published artifact is canonical.</p></section>
+  <section class="block"><dl class="provenance"><dt>Content source</dt><dd>{portal.provenance.contentSource}</dd><dt>Deployment</dt><dd>{portal.provenance.deployment}</dd><dt>Judge</dt><dd>{portal.provenance.judge}</dd><dt>Measured evidence</dt><dd>{portal.provenance.evidence}</dd><dt>Known gap</dt><dd class="notice">{portal.provenance.knownGap}</dd></dl></section></div>
+</BaseLayout>

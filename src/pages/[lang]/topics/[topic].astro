@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { LOCALES, localizedPath, withBase } from '../../../i18n/locales.js';
+import { course } from '../../../lib/course.js';
+import { MATERIAL_LABELS, portal, overallReadiness } from '../../../lib/portal.js';
+
+export function getStaticPaths() {
+  return LOCALES.flatMap((lang) => portal.topics.map((topic) => ({
+    params: { lang, topic: topic.id }, props: { topic },
+  })));
+}
+const { lang } = Astro.params;
+const { topic } = Astro.props;
+const lecture = course.lectures.find((item) => item.topic === topic.n);
+const state = overallReadiness(lecture?.materials);
+---
+<BaseLayout lang={lang} page="" title={`Topic ${topic.id}: ${topic.title}`} description={topic.summary}>
+  <div class="wrap topic-page">
+    <header class="page-head">
+      <div class="eyebrow">Topic {topic.id} · {state}</div>
+      <h1>{topic.title}</h1>
+      <p class="sub">{topic.summary}</p>
+      <div class="action-row">
+        <a class="button" href={withBase('/' + lecture.deckFile)}>Open slides</a>
+        {lecture.colab && <a class="button secondary" href={lecture.colab}>Open lab in Colab</a>}
+        {lecture.notebook && <a href={`${course.meta.repo}/blob/main/${lecture.notebook}`}>Notebook source</a>}
+      </div>
+    </header>
+
+    <section class="block" aria-labelledby="readiness">
+      <h2 id="readiness">Material readiness</h2>
+      <div class="status-grid">
+        {Object.entries(lecture.materials).map(([key, value]) => (
+          <div class="status-item"><span>{MATERIAL_LABELS[key]}</span><strong class={`state state-${value}`}>{value}</strong></div>
+        ))}
+      </div>
+    </section>
+
+    <section class="block"><h2>Learning outcomes</h2><ol class="reading">{topic.outcomes.map((item) => <li>{item}</li>)}</ol></section>
+    <section class="block"><h2>Contact-session plan</h2><div class="table-scroll"><table><thead><tr><th>Segment</th><th>Time</th></tr></thead><tbody>{topic.session.map(([name, time]) => <tr><td>{name}</td><td class="d">{time}</td></tr>)}</tbody></table></div><p class="kicker">Expected workload · {topic.workload}</p></section>
+    <div class="two-up">
+      <section class="block"><h2>Required artifacts</h2><ul class="reading">{topic.artifacts.map((item) => <li>{item}</li>)}</ul></section>
+      <section class="block"><h2>Acceptance checklist</h2><ul class="reading checklist">{topic.acceptance.map((item) => <li>{item}</li>)}</ul></section>
+    </div>
+    <section class="block"><h2>Required reading</h2><ul class="reading">{topic.reading.map((item) => <li>{item}</li>)}</ul></section>
+    <nav class="topic-nav" aria-label="Topic navigation">
+      {topic.n > 0 && portal.topics.some((x) => x.n === topic.n - 1) && <a href={localizedPath(lang, `topics/${String(topic.n - 1).padStart(2, '0')}`)}>← Previous topic</a>}
+      <a href={localizedPath(lang)}>All materials</a>
+      {portal.topics.some((x) => x.n === topic.n + 1) && <a href={localizedPath(lang, `topics/${String(topic.n + 1).padStart(2, '0')}`)}>Next topic →</a>}
+    </nav>
+  </div>
+</BaseLayout>

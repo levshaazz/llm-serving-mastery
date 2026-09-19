@@ -13,7 +13,7 @@
             </thead>
             <tbody>
               <tr><td><strong>TTFT</strong></td><td><span lang="en">time to the first bite</span></td><td><span lang="en">time to first token: from sending the request to receiving the first streamed token</span></td></tr>
-              <tr><td><strong>TPOT</strong></td><td><span lang="en">pace between courses</span></td><td><span lang="en">time per output token after the first (a.k.a. inter-token latency)</span></td></tr>
+              <tr><td><strong>TPOT</strong></td><td><span lang="en">pace between courses</span></td><td><span lang="en">decode duration divided by post-first-token gaps; related to, but not identical with, an individual inter-token latency</span></td></tr>
               <tr><td><strong><span lang="en">Throughput</span></strong></td><td><span lang="en">plates per hour</span></td><td><span lang="en">output tokens per second, summed over all concurrent requests</span></td></tr>
               <tr><td><strong>p95</strong></td><td><span lang="en">the slow tail</span></td><td><span lang="en">the value 95% of successful requests beat; always report failures beside it</span></td></tr>
             </tbody>
@@ -29,4 +29,3 @@
         </section>
 
         <!-- ============================================ PAUSE · predict ============================================ -->
-

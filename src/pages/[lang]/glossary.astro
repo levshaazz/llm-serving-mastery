@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, localizedPath } from '../../i18n/locales.js';
+import { portal } from '../../lib/portal.js';
+export function getStaticPaths() { return LOCALES.map((lang) => ({ params: { lang } })); }
+const { lang } = Astro.params;
+---
+<BaseLayout lang={lang} page="glossary" title="Glossary">
+  <div class="wrap"><section class="block"><h1>Glossary</h1><p class="sub">Course-local definitions. Each term links back to the topic where its measurement contract is introduced.</p><label class="search-label" for="glossary-filter">Filter terms</label><input id="glossary-filter" class="search-input" type="search" placeholder="TTFT, KV cache, roofline…" /></section>
+  <section class="block"><dl class="glossary" id="glossary-list">{portal.glossary.map(([term, definition, topic]) => <div data-entry={`${term} ${definition}`.toLowerCase()}><dt>{term} <a href={localizedPath(lang, `topics/${String(topic).padStart(2, '0')}`)}>T{String(topic).padStart(2, '0')}</a></dt><dd>{definition}</dd></div>)}</dl><p id="glossary-empty" hidden>No matching terms.</p></section></div>
+  <script is:inline>
+    const input = document.querySelector('#glossary-filter'); const entries = [...document.querySelectorAll('#glossary-list > div')]; const empty = document.querySelector('#glossary-empty');
+    input?.addEventListener('input', () => { const q = input.value.trim().toLowerCase(); let shown = 0; entries.forEach((el) => { el.hidden = q && !el.dataset.entry.includes(q); if (!el.hidden) shown++; }); empty.hidden = shown !== 0; });
+  </script>
+</BaseLayout>

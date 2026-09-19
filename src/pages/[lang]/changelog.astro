@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES } from '../../i18n/locales.js';
+import { portal } from '../../lib/portal.js';
+export function getStaticPaths() { return LOCALES.map((lang) => ({ params: { lang } })); }
+const { lang } = Astro.params;
+---
+<BaseLayout lang={lang} page="changelog" title="Changelog">
+  <div class="wrap"><section class="block"><h1>Course changelog</h1><p class="sub">Material changes that affect student work, evaluation, or interpretation.</p></section><section class="block"><ol class="change-list">{portal.changelog.map((entry) => <li><time datetime={entry.date}>{entry.date}</time><span class="state state-partial">{entry.kind}</span><p>{entry.text}</p></li>)}</ol></section></div>
+</BaseLayout>

@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { LOCALES, t, withBase, localizedPath } from '../../i18n/locales.js';
 import { ui } from '../../i18n/ui.js';
 import { course } from '../../lib/course.js';
+import { MATERIAL_LABELS, overallReadiness, portal } from '../../lib/portal.js';
 
 export function getStaticPaths() {
   return LOCALES.map((l) => ({ params: { lang: l } }));
@@ -32,19 +33,26 @@ const publishedTopics = new Set(course.lectures.map((lecture) => lecture.topic).
   </header>
 
   <div class="wrap">
+    <section class="block dashboard" aria-labelledby="dashboard-title">
+      <div><div class="eyebrow">Student dashboard · updated {portal.updated}</div><h2 id="dashboard-title">Now: Topic {String(portal.dashboard.currentTopic).padStart(2, '0')} · Round {portal.dashboard.currentRound}</h2><p class="notice">{portal.dashboard.notice}</p></div>
+      <div><h3>Next actions</h3><ol class="reading">{portal.dashboard.next.map((item) => <li>{item}</li>)}</ol></div>
+    </section>
+
     <section class="block" id="lectures">
       <h2>{t(ui.sections.lectures, lang)}</h2>
       <div class="kicker">{t(ui.sections.lecturesKicker, lang)}</div>
       <div class="cards">
         {course.lectures.map((lec) => (
-          <div class={`card${lec.status === 'ready' ? '' : ' soon'}`}>
-            <span class={`tag ${lec.status === 'ready' ? 'ready' : 'soon'}`}>
-              {lec.status === 'ready' ? t(ui.labels.ready, lang) : t(ui.labels.coming, lang)}
+          <div class={`card${overallReadiness(lec.materials) === 'ready' ? '' : ' partial'}`}>
+            <span class={`tag ${overallReadiness(lec.materials) === 'ready' ? 'ready' : 'soon'}`}>
+              {overallReadiness(lec.materials)}
             </span>
             <div class="num">L{lec.id}</div>
-            <h3>{t(lec.title, lang)}</h3>
+            <h3><a href={localizedPath(lang, `topics/${lec.id}`)}>{t(lec.title, lang)}</a></h3>
             <p>{t(lec.blurb, lang)}</p>
+            <div class="mini-statuses">{Object.entries(lec.materials).map(([key, value]) => <span class={`state state-${value}`}>{MATERIAL_LABELS[key]}: {value}</span>)}</div>
             <div class="links">
+              <a href={localizedPath(lang, `topics/${lec.id}`)}>Topic page →</a>
               {lec.deckFile && <a href={withBase('/' + lec.deckFile)}>{t(ui.labels.openSlides, lang)} →</a>}
               {lec.colab && <a href={lec.colab}>{t(ui.labels.openColab, lang)}</a>}
             </div>

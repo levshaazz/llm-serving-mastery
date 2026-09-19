@@ -22,3 +22,7 @@ __pycache__/
 judge/roster.csv
 judge/rounds/
 runs/
+!seminars/runs/
+seminars/runs/*
+!seminars/runs/README.md
+!seminars/runs/*.legacy-invalid.txt

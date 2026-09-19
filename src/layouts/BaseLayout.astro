@@ -4,17 +4,23 @@ import '../styles/global.css';
 import { LOCALES, LOCALE_LABEL, LOCALE_NAME, HTML_LANG, t, localizedPath, withBase } from '../i18n/locales.js';
 import { ui } from '../i18n/ui.js';
 import { course } from '../lib/course.js';
+import { portal } from '../lib/portal.js';
 
 const { lang, page = '', title, description } = Astro.props;
 const pageTitle = title
   ? `${title} · ${t(course.meta.title, lang)}`
   : `${t(course.meta.title, lang)} · ${t(course.meta.subtitle, lang)}`;
 const desc = description || t(course.meta.tagline, lang);
-const ogImg = withBase('/Lectures/assets/img/L0/L0-01-rush-hour.webp');
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImg = new URL(withBase('/Lectures/assets/img/L0/L0-01-rush-hour.webp'), Astro.site);
+const buildSha = import.meta.env.PUBLIC_BUILD_SHA || 'local';
 const NAV = [
   ['', ui.nav.lectures],
+  ['schedule', 'Schedule'],
   ['syllabus', ui.nav.syllabus],
   ['leaderboard', ui.nav.leaderboard],
+  ['glossary', 'Glossary'],
+  ['search', 'Search'],
 ];
 ---
 <!DOCTYPE html>
@@ -24,9 +30,11 @@ const NAV = [
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{pageTitle}</title>
   <meta name="description" content={desc} />
+  <link rel="canonical" href={canonical} />
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={desc} />
   <meta property="og:image" content={ogImg} />
+  <meta property="og:url" content={canonical} />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <!-- no-flash: apply saved theme before first paint -->
@@ -72,7 +80,8 @@ const NAV = [
   <footer class="site-footer">
     <div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;width:100%">
       <div>{t(course.meta.title, lang)} · {t(course.meta.subtitle, lang)}</div>
-      <div><a href={course.meta.repo}>GitHub</a> · {course.meta.instructor}</div>
+      <div><a href={localizedPath(lang, 'changelog')}>Changelog</a> · <a href={localizedPath(lang, 'provenance')}>Provenance</a> · <a href={course.meta.repo}>GitHub</a></div>
+      <div>Updated {portal.updated} · build <a href={`${course.meta.repo}/commit/${buildSha}`}>{buildSha.slice(0, 7)}</a></div>
     </div>
   </footer>
 

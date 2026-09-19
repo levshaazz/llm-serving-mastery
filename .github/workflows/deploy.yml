@@ -1,7 +1,5 @@
-name: Deploy site to GitHub Pages
+name: Build, verify, and deploy Pages
 
-# Builds the Astro site (home / syllabus / leaderboard), assembles the lecture decks
-# from their parts/ and publishes both. Runs on push to main and on demand.
 on:
   push:
     branches: [main]
@@ -19,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PUBLIC_BUILD_SHA: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
@@ -30,6 +30,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run check
       - run: npm run build
+      - run: npm run check:site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs

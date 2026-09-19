@@ -15,7 +15,7 @@ const blockTitle = Object.fromEntries(course.blocks.map((b) => [b.id, b.title]))
 <BaseLayout lang={lang} page="syllabus" title={t(ui.nav.syllabus, lang)}>
   <div class="wrap">
     <section class="block">
-      <h2>{t(m.title, lang)}: {t(m.subtitle, lang)}</h2>
+      <h1>{t(m.title, lang)}: {t(m.subtitle, lang)}</h1>
       <div class="kicker">{t(m.term, lang)}</div>
       <p class="sub">{t(course.goal, lang)}</p>
       <div class="meta">

@@ -1,0 +1,85 @@
+{
+  "updated": "2026-09-20",
+  "dashboard": {
+    "currentTopic": 2,
+    "currentRound": 1,
+    "notice": "Topic 02 is published. Topic 00 measured reference numbers remain withdrawn until a metric-contract-v2 rehearsal is captured.",
+    "next": [
+      "Complete the Topic 02 notebook on a CUDA GPU.",
+      "Submit benchmark JSON, profiler trace, and analysis markdown.",
+      "Keep successful-request latency and failure rate separate."
+    ]
+  },
+  "topics": [
+    {
+      "n": 0,
+      "id": "00",
+      "slug": "introduction",
+      "title": "Introduction: the kitchen at rush hour",
+      "summary": "Course contract, assessment, measurement vocabulary, and the first serving-system comparison.",
+      "outcomes": ["Explain the course delivery and grading contract.", "Distinguish throughput, TTFT, TPOT, end-to-end latency, and failure rate.", "Read a concurrency experiment without hiding failures inside latency."],
+      "session": [["Course contract", "25 min"], ["Metrics and failure semantics", "30 min"], ["Live demonstration", "25 min"], ["Submission workflow", "10 min"]],
+      "artifacts": ["Completed live-demo notebook", "Environment and model revision record", "Written interpretation of the concurrency curves"],
+      "acceptance": ["Latency percentiles use successful requests only.", "Failures and timeouts are reported beside latency.", "Token-throughput counting method is disclosed.", "Measured claims cite a canonical rehearsal or are labelled illustrative."],
+      "reading": ["Course syllabus and leaderboard contract", "Kwon et al., PagedAttention (motivation and evaluation methodology)"],
+      "workload": "2 hours contact + 8–12 hours guided work"
+    },
+    {
+      "n": 1,
+      "id": "01",
+      "slug": "modern-inference-systems",
+      "title": "Modern LLM inference systems & production challenges",
+      "summary": "Request lifecycle, prefill/decode, production objectives, overload, capacity, and a reproducible baseline.",
+      "outcomes": ["Trace a streaming request across production boundaries.", "Separate service demand, queueing, TTFT, decode cadence, and completion latency.", "Translate an SLO and workload into a capacity hypothesis.", "Explain overload behavior and cancellation obligations."],
+      "session": [["Request clock and boundaries", "25 min"], ["Prefill, decode, and scheduling", "30 min"], ["SLO and capacity clinic", "20 min"], ["Baseline lab launch", "15 min"]],
+      "artifacts": ["Serving baseline notebook", "Pinned environment manifest", "Raw request records and aggregate metrics", "Boundary diagram with timestamps"],
+      "acceptance": ["Warm-up is separate from measured trials.", "Arrival process and concurrency are explicit.", "The report includes raw trials and variability.", "Every architecture claim is linked to a product promise or failure mode."],
+      "reading": ["Orca: iteration-level scheduling", "vLLM / PagedAttention", "DistServe: prefill/decode interference"],
+      "workload": "2 hours contact + 10–14 hours guided work"
+    },
+    {
+      "n": 2,
+      "id": "02",
+      "slug": "inference-bottlenecks",
+      "title": "Inference bottlenecks: KV cache, memory hierarchy, autoregression",
+      "summary": "Phase-specific tensor shapes, memory traffic, roofline reasoning, KV accounting, and profiler evidence.",
+      "outcomes": ["Predict how prefill and decode stress a GPU differently.", "Derive KV-cache bytes/token from a pinned model config.", "Use synchronized timing and select the right profiler layer.", "Reconcile a hand calculation with measured evidence."],
+      "session": [["Autoregressive graph and shapes", "20 min"], ["Hierarchy and roofline", "25 min"], ["KV capacity and traffic", "20 min"], ["Profiler triage", "10 min"], ["Lab launch", "15 min"]],
+      "artifacts": ["evidence/topic-02-benchmark.json", "evidence/topic-02-trace.json", "evidence/topic-02-analysis.md"],
+      "acceptance": ["Both model revisions are immutable commits.", "Load, warm-up, prefill, and decode are distinct regions.", "CUDA timing is synchronized.", "Allocated, reserved, peak, and device-total memory are not conflated.", "Profiler overhead is not presented as production latency."],
+      "reading": ["Roofline model (Williams et al.)", "CUDA C++ Best Practices: memory", "FlashAttention: IO awareness", "PyTorch profiler documentation"],
+      "workload": "2 hours contact + 12–16 hours guided work"
+    }
+  ],
+  "glossary": [
+    ["Admission control", "Decision to accept, queue, shed, or defer a request before it consumes scarce serving capacity.", 1],
+    ["Arithmetic intensity", "Operations performed per byte moved at the memory level being modeled.", 2],
+    ["Continuous batching", "Scheduler that can change the active request batch between decode iterations.", 1],
+    ["Decode", "Autoregressive phase that produces new tokens one iteration at a time using cached keys and values.", 1],
+    ["Failure rate", "Failed requests divided by all attempted requests under the declared workload and timeout.", 0],
+    ["GQA", "Grouped-query attention: multiple query heads share fewer key/value heads.", 2],
+    ["ITL", "Inter-token latency: time between two consecutive streamed output tokens for one request.", 0],
+    ["KV cache", "Per-request key/value state retained from earlier tokens to avoid recomputing attention history.", 2],
+    ["Little’s Law", "For a stable system, average concurrency equals arrival rate times average time in system: L=λW.", 1],
+    ["Operational intensity", "Measured operations per byte at a chosen boundary; used to place work on a roofline chart.", 2],
+    ["Prefill", "Parallel processing of prompt tokens that builds initial KV state and produces the first-token logits.", 1],
+    ["Roofline", "Upper-bound performance model combining compute and bandwidth ceilings; not a full latency predictor.", 2],
+    ["SLO", "Service-level objective: a measurable reliability or performance target over a defined population and window.", 1],
+    ["Tail latency", "A high percentile such as p95 or p99, always meaningful only with its population and failure semantics.", 0],
+    ["TPOT", "Time per output token after the first, usually decode duration divided by post-first-token gaps; not one individual ITL.", 0],
+    ["TTFT", "Time from the declared request start boundary until the first output token becomes observable.", 0]
+  ],
+  "changelog": [
+    {"date": "2026-09-20", "kind": "contract", "text": "Judge preparation, image build, server start, and readiness now share one 30-minute startup budget."},
+    {"date": "2026-09-20", "kind": "lab", "text": "Published the Topic 02 pinned GPU profiling notebook and evidence contract."},
+    {"date": "2026-09-20", "kind": "evidence", "text": "Withdrew the legacy Topic 00 rehearsal from canonical evidence pending a metric-contract-v2 rerun."},
+    {"date": "2026-09-20", "kind": "portal", "text": "Added per-material readiness, topic pages, dashboard, schedule, glossary, search, provenance, and automated checks."}
+  ],
+  "provenance": {
+    "contentSource": "Repository files on the deployed commit are canonical; generated docs/ output is not edited directly.",
+    "deployment": "GitHub Actions builds Astro and lecture decks, runs contract and link checks, then deploys the artifact to Pages.",
+    "judge": "Judge contract v3; 90-minute whole-run budget and one shared 30-minute startup budget for preparation, build, server start, and readiness.",
+    "evidence": "Reference numbers require raw request records, environment and revision metadata, metric-contract version, and an operator note.",
+    "knownGap": "Topic 00 has no current canonical rehearsal; its old timeout-capped run is archived as legacy-invalid."
+  }
+}

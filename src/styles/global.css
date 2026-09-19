@@ -84,7 +84,7 @@ h1 {
 .meta .v { font-weight: 600; margin-top: 2px; }
 
 /* ── sections / headings ──────────────────────────────────────────────────── */
-section.block { padding: var(--ws-5) 0; border-bottom: var(--hairline) solid var(--rule); }
+section.block { padding: var(--ws-5) 0; border-bottom: var(--hairline) solid var(--rule); min-width: 0; }
 h2 { font-family: var(--font-serif); font-weight: 600; font-size: var(--fz-h2); margin: 0 0 6px; }
 .kicker {
   font-family: var(--font-mono); font-size: var(--fz-tiny); letter-spacing: 2px;
@@ -116,10 +116,22 @@ h2 { font-family: var(--font-serif); font-weight: 600; font-size: var(--fz-h2); 
 .tag.ready { background: var(--accent-soft); color: var(--accent-ink); }
 .tag.soon { background: var(--c-amber-soft); color: var(--c-amber-ink); }
 
+.card.partial { border-style: solid; }
+.mini-statuses { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--ws-2); }
+.state {
+  display: inline-block; width: fit-content; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: .5px; text-transform: uppercase; border-radius: var(--r-pill);
+  padding: 3px 7px; background: var(--bg-alt); color: var(--ink-2);
+}
+.state-ready { background: var(--accent-soft); color: var(--accent-ink); }
+.state-partial, .state-needs-rehearsal { background: var(--c-amber-soft); color: var(--c-amber-ink); }
+.state-student-generated, .state-planned { background: var(--bg-alt); color: var(--ink-2); }
+
 /* ── deep-dives (additional topics) — set apart from the core syllabus with a warm accent band ── */
 
 /* ── tables ───────────────────────────────────────────────────────────────── */
 table { width: 100%; border-collapse: collapse; font-size: var(--fz-small); }
+.table-scroll { width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
 th, td { text-align: left; padding: 10px 12px; border-bottom: var(--hairline) solid var(--rule); vertical-align: top; }
 th { font-family: var(--font-mono); font-size: var(--fz-tiny); letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); border-bottom: var(--line) solid var(--rule-strong); }
 td.d { font-family: var(--font-mono); white-space: nowrap; color: var(--ink-2); }
@@ -148,6 +160,35 @@ tr.row-workshop td:first-child, tr.row-workshop td.d { color: var(--warm-ink); }
 
 ul.reading { margin: 0; padding-left: 20px; color: var(--ink-2); font-size: var(--fz-small); line-height: 1.9; }
 
+/* ── dashboard / topic portal ─────────────────────────────────────────────── */
+.dashboard { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, .6fr); gap: var(--ws-5); align-items: start; }
+.page-head { padding: var(--ws-5) 0 var(--ws-4); border-bottom: var(--hairline) solid var(--rule); }
+.action-row { display: flex; flex-wrap: wrap; gap: var(--ws-2); align-items: center; margin-top: var(--ws-3); }
+.button { display: inline-block; padding: 8px 13px; border-radius: var(--r-sm); background: var(--accent); color: #fff; text-decoration: none; font-weight: 700; }
+.button.secondary { color: var(--accent-ink); background: var(--accent-soft); border: var(--hairline) solid var(--accent); }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--ws-2); }
+.status-item { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: var(--ws-2); background: var(--bg-card); border: var(--hairline) solid var(--rule); border-radius: var(--r-sm); }
+.two-up { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ws-5); }
+.topic-nav { display: flex; justify-content: space-between; gap: var(--ws-2); padding: var(--ws-4) 0 var(--ws-5); }
+.checklist { list-style: "✓  "; }
+.search-label { display: block; font-family: var(--font-mono); font-size: var(--fz-tiny); text-transform: uppercase; letter-spacing: 1px; margin: var(--ws-3) 0 6px; }
+.search-input { width: 100%; max-width: 720px; padding: 12px 14px; color: var(--ink); background: var(--bg-card); border: var(--line) solid var(--rule-strong); border-radius: var(--r-sm); font: inherit; }
+.glossary { display: grid; gap: var(--ws-3); margin: 0; }
+.glossary > div { border-bottom: var(--hairline) solid var(--rule); padding-bottom: var(--ws-3); }
+.glossary dt, .provenance dt { font-family: var(--font-serif); font-size: var(--fz-h3); font-weight: 600; }
+.glossary dt a { font: var(--fz-tiny) var(--font-mono); }
+.glossary dd, .provenance dd { margin: 5px 0 0; color: var(--ink-2); }
+.provenance { display: grid; gap: 8px; }
+.provenance dd { margin-bottom: var(--ws-3); }
+.search-results { display: grid; gap: var(--ws-3); }
+.search-result { border-bottom: var(--hairline) solid var(--rule); padding-bottom: var(--ws-3); }
+.search-result h2 { font-size: var(--fz-h3); margin: 6px 0; }
+.search-result p { color: var(--ink-2); margin: 0; }
+.change-list { list-style: none; margin: 0; padding: 0; }
+.change-list li { display: grid; grid-template-columns: 110px 100px 1fr; gap: var(--ws-2); padding: var(--ws-2) 0; border-bottom: var(--hairline) solid var(--rule); }
+.change-list time { font-family: var(--font-mono); font-size: var(--fz-tiny); }
+.change-list p { margin: 0; }
+
 /* ── footer ───────────────────────────────────────────────────────────────── */
 .site-footer {
   padding: var(--ws-5) 0; color: var(--ink-3); font-size: var(--fz-tiny);
@@ -156,7 +197,17 @@ ul.reading { margin: 0; padding-left: 20px; color: var(--ink-2); font-size: var(
 
 @media (max-width: 600px) {
   .topbar { flex-wrap: wrap; }
+  .nav { order: 3; width: 100%; gap: var(--ws-2); overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .nav a { white-space: nowrap; }
   .meta { gap: var(--ws-3); }
+  .dashboard, .two-up { grid-template-columns: 1fr; gap: 0; }
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  section.block { overflow-x: auto; }
+  .block > table, .block > details, .block > article { max-width: 100%; }
+  table { min-width: 620px; }
+  .status-grid { grid-template-columns: 1fr; }
+  .topic-nav { flex-wrap: wrap; }
+  .change-list li { grid-template-columns: 1fr; }
 }
 
 /* ── Print: syllabus / schedule / assignments (and every page) on paper ──────

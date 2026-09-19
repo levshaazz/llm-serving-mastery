@@ -72,6 +72,26 @@ class Deadline:
         self.timeout(1, phase)
 
 
+class PhaseDeadline:
+    """A phase budget capped by the submission-wide deadline."""
+
+    def __init__(self, parent, seconds, label):
+        self.parent = parent
+        self.seconds = seconds
+        self.label = label
+        self.end = min(parent.end, time.monotonic() + seconds)
+
+    def timeout(self, cap, phase):
+        self.parent.check(phase)
+        left = self.end - time.monotonic()
+        if left <= 0:
+            raise Step(f"{self.label} exceeded its total budget of {self.seconds} s during {phase}")
+        return max(1, min(cap, left))
+
+    def check(self, phase):
+        self.timeout(1, phase)
+
+
 # ── 1. fetch ─────────────────────────────────────────────────────────────────────────────
 def is_git_dir(p):
     p = pathlib.Path(p)
@@ -263,7 +283,7 @@ def start_server(src, cfg, out, tag, sandbox, cache_dir, runtime_dir, deadline, 
 def wait_ready(server, cfg, deadline):
     port, name = cfg["server"]["port"], cfg["server"]["model_name"]
     t0 = time.time()
-    while time.time() - t0 < cfg["server"]["startup_timeout_s"]:
+    while True:
         deadline.check("server startup")
         if server["proc"].poll() is not None:
             raise Step(f"server exited with code {server['proc'].returncode} before becoming ready (see serve.log)")
@@ -279,7 +299,6 @@ def wait_ready(server, cfg, deadline):
             if ids:
                 raise Step(f"/v1/models lists {ids}, expected '{name}' (use --served-model-name {name})")
         time.sleep(5)
-    raise Step(f"not ready after {cfg['server']['startup_timeout_s']} s")
 
 
 def stop_server(server, cfg):
@@ -662,9 +681,12 @@ def main():
             res["provenance"]["quality_datasets"] = prepare_quality_datasets(cfg, deadline)
         canaries, tokenizer = ([], None) if a.skip_speed else build_prompts(cfg, seed, out / "prompts.jsonl")
         judge_env.update(HF_DATASETS_OFFLINE="1", HF_HUB_OFFLINE="1")
-        server = start_server(src, cfg, out, out.name, a.sandbox, cache_dir, runtime_dir, deadline,
+        setup_started = time.monotonic()
+        setup_deadline = PhaseDeadline(deadline, cfg["server"]["startup_timeout_s"], "server setup")
+        server = start_server(src, cfg, out, out.name, a.sandbox, cache_dir, runtime_dir, setup_deadline,
                               c["submission"])
-        ready = wait_ready(server, cfg, deadline)
+        ready = wait_ready(server, cfg, setup_deadline)
+        ready["ready_after_s"] = round(time.monotonic() - setup_started, 1)
         verify_model_identity(c, ready)
         res["steps"]["start"] = {"mode": server["mode"], **ready,
                                    "declared_revision": c["submission"]["model_revision"]}

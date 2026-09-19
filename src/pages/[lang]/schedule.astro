@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, localizedPath, t } from '../../i18n/locales.js';
+import { course } from '../../lib/course.js';
+import { portal, overallReadiness } from '../../lib/portal.js';
+export function getStaticPaths() { return LOCALES.map((lang) => ({ params: { lang } })); }
+const { lang } = Astro.params;
+const intro = course.lectures.find((x) => x.topic === 0);
+const rows = [{ n: 0, title: intro.title, seminar: { en: 'Course contract, metrics, and live demonstration' } }, ...course.topics];
+---
+<BaseLayout lang={lang} page="schedule" title="Schedule">
+  <div class="wrap"><section class="block"><h1>Course schedule</h1><p class="sub">Fifteen topics plus orientation. Dates remain TBA; sequence, workload, and published-material status are canonical here.</p></section>
+  <section class="block"><div class="table-scroll"><table><thead><tr><th>Topic</th><th>Lecture</th><th>Seminar / milestone</th><th>Readiness</th></tr></thead><tbody>
+    {rows.map((row) => { const lecture = course.lectures.find((x) => x.topic === row.n); const detail = portal.topics.find((x) => x.n === row.n); return <tr><td class="d">{String(row.n).padStart(2, '0')}</td><td>{detail ? <a href={localizedPath(lang, `topics/${String(row.n).padStart(2, '0')}`)}>{t(row.title, lang)}</a> : t(row.title, lang)}</td><td>{t(row.seminar, lang)}</td><td><span class={`state state-${overallReadiness(lecture?.materials)}`}>{overallReadiness(lecture?.materials)}</span></td></tr>; })}
+  </tbody></table></div></section></div>
+</BaseLayout>

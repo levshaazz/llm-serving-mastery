@@ -3,12 +3,33 @@ import math, pathlib, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from score import score_round, speed_score  # noqa: E402
-from run_submission import canary_evidence, parse_guidellm  # noqa: E402
+import run_submission as judge_runtime  # noqa: E402
+from run_submission import Deadline, PhaseDeadline, Step, canary_evidence, parse_guidellm  # noqa: E402
 
 TH = {"quality_gates": {"gsm8k": 0.5, "ifeval": 0.5, "mmlu_pro": 0.3},
       "speed_bar_S": 1000.0, "ttft_p95_slo_s": 2.0, "max_error_rate": 0.01, "min_output_share": 0.95,
       "canary_min_similarity": 0.5, "canary_similarity_stat": "min", "canary_max_short_outputs": 0,
       "canary_min_unique_share": 0.75}
+
+
+def test_startup_phase_uses_one_shared_budget():
+    original = judge_runtime.time.monotonic
+    clock = [10.0]
+    try:
+        judge_runtime.time.monotonic = lambda: clock[0]
+        parent = Deadline(100)
+        startup = PhaseDeadline(parent, 30, "server setup")
+        assert startup.timeout(1800, "build") == 30
+        clock[0] = 25
+        assert startup.timeout(1800, "readiness") == 15
+        clock[0] = 40
+        try:
+            startup.check("readiness")
+            assert False, "startup phase must expire 30 seconds after it starts"
+        except Step as exc:
+            assert "total budget" in str(exc)
+    finally:
+        judge_runtime.time.monotonic = original
 
 
 def result(t32, t64, ttft=1.0, q=(0.6, 0.6, 0.4), failed=0, ok=True, out_len=256, canary=0.95,
