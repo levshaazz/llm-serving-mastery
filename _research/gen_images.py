@@ -162,6 +162,11 @@ JOBS = [
      "CONTROLLED FLOW. Serega calmly supervises a bounded queue feeding three coordinated GPU stoves; "
      "simple chart shapes show stable observable operation. The left third remains open for slide copy. "
      "No labels or plants. The green tübetey is the ONLY green object."),
+    ("L02", "L02/L02-01-memory-wall.png", "16:9", True,
+     "THE MEMORY WALL. In a GPU kitchen, Serega stands between an enormous pantry wall and a small "
+     "blazing compute stove. A long conveyor of tiny ingredient cards travels from the pantry to the "
+     "stove for every serving; the stove intermittently waits while the conveyor is packed. No labels, "
+     "no plants, and no text. The green tübetey is the ONLY green object."),
 ]
 
 H = {"Authorization": f"Bearer {API_KEY}"}
