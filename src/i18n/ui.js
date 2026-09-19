@@ -17,7 +17,7 @@ export const ui = {
     demo: { en: 'Live demo' },
     demoKicker: { en: 'Lecture 0 · naive pipeline vs vLLM on a Colab T4' },
     topics: { en: 'Topics' },
-    topicsKicker: { en: '15 topics · each one a lecture + a hands-on seminar · pace adapts, order does not' },
+    topicsKicker: { en: '15 topics · lectures + hands-on seminars (10–12: lecture only, for now) · pace adapts, order does not' },
     goal: { en: 'Goal' },
     outcomes: { en: 'Learning outcomes' },
     prerequisites: { en: 'Prerequisites' },
@@ -88,6 +88,6 @@ export const ui = {
     overdrive: { en: 'Overdrive' },
     exemption: { en: 'Exam waiver' },
     dryRun: { en: 'Dry runs' },
-    contractRule: { en: 'The commit your round-NN tag points to at Thursday 23:59 is checked out clean; the server must list the model "submission" within 30 minutes and stream a smoke answer — else the round is 0.' },
+    contractRule: { en: 'The commit your round-NN tag points to at Thursday 23:59 MSK is checked out clean; the server must list the model "submission" within 30 minutes and stream a smoke answer — else the round is 0.' },
   },
 };

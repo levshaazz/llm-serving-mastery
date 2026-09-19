@@ -21,7 +21,7 @@
       "en": "ML / LLM engineers, MLOps, DevOps and backend engineers"
     },
     "format": {
-      "en": "15 topics · each one a lecture + a hands-on seminar"
+      "en": "15 topics · lectures + hands-on seminars (topics 10–12: lecture and live demo only, for now)"
     },
     "workload": {
       "en": "≈ 10–14 hours per week, ≈ 150–200 hours in total"
@@ -46,7 +46,7 @@
       "en": "Benchmark a serving stack honestly: throughput, TTFT, TPOT, p95, failures — under 1 to 128+ concurrent clients."
     },
     {
-      "en": "Package, deploy and scale inference: Docker, tensor parallelism, Kubernetes with GPU Operator and HPA."
+      "en": "Package inference in Docker and design multi-GPU and Kubernetes deployments: tensor parallelism, GPU Operator, HPA."
     },
     {
       "en": "Operate it: metrics, dashboards, alerts and cost per million tokens."
@@ -259,10 +259,10 @@
         "en": "Multi-GPU inference: tensor parallelism"
       },
       "seminar": {
-        "en": "tensor-parallel-size = 2 and 4"
+        "en": "No hands-on seminar for now — lecture with a live demo"
       },
       "milestone": {
-        "en": "Multi-GPU report: configuration, metrics, conclusions"
+        "en": "— (covered on the exam)"
       }
     },
     {
@@ -272,10 +272,10 @@
         "en": "Kubernetes for LLM serving: GPU Operator & Helm"
       },
       "seminar": {
-        "en": "Deploy vLLM on Kubernetes with the production-stack Helm chart"
+        "en": "No hands-on seminar for now — lecture with a live demo"
       },
       "milestone": {
-        "en": "Manifests / values.yaml + deployment write-up"
+        "en": "— (covered on the exam)"
       }
     },
     {
@@ -285,10 +285,10 @@
         "en": "Advanced Kubernetes: single-pod concurrency & HPA"
       },
       "seminar": {
-        "en": "One fat pod vs several light replicas; configure HPA"
+        "en": "No hands-on seminar for now — lecture with a live demo"
       },
       "milestone": {
-        "en": "Pod-capacity experiment + HPA recommendation"
+        "en": "— (covered on the exam)"
       }
     },
     {
@@ -346,7 +346,7 @@
       "en": "Any stack and any kernels: vLLM, SGLang, llama.cpp, TensorRT-LLM, your own CUDA/Triton — as long as the contract holds."
     },
     "submission": {
-      "en": "Push a git tag round-NN (round-01 … round-10) to your public repository before Thursday 23:59. The judge checks out exactly that tag."
+      "en": "Push a git tag round-NN (round-01 … round-10) to your public repository before Thursday 23:59 MSK. At the deadline the judge records the commit that tag points to and measures exactly that commit."
     },
     "contract": [
       {
@@ -399,7 +399,7 @@
       "en": "Overdrive ≥ 10 after round 10 → the final exam is waived and credited at 40 / 50. The defense is still mandatory."
     },
     "deadline": {
-      "en": "Every round closes on Thursday at 23:59."
+      "en": "Every round closes on Thursday at 23:59 Moscow time (MSK, UTC+3)."
     },
     "latency": {
       "en": "Latency gate: p95 time-to-first-token at 64 clients must not exceed the round's SLO (reference p95 × 1.25). Errors ≤ 1%, and answers must really be 256 tokens long."
@@ -467,7 +467,7 @@
       }
     ],
     "policy": {
-      "en": "Cheating — zero tolerance. No late submissions: a round closes on Thursday at 23:59; a missing tag is a 0 for that round. Gaming the benchmark (caching eval answers, special-casing the prompt set, degrading output to win speed) disqualifies the round."
+      "en": "Cheating — zero tolerance. No late submissions: a round closes on Thursday at 23:59 MSK; a missing tag is a 0 for that round. Gaming the benchmark (caching eval answers, special-casing the prompt set, degrading output to win speed) disqualifies the round."
     }
   },
   "lectures": [

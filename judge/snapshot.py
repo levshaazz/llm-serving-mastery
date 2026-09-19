@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-snapshot.py — freeze every student's round at the deadline (Thursday 23:59; run it from cron at 00:00).
+snapshot.py — freeze every student's round at the deadline (Thursday 23:59 MSK; cron at Friday 00:00 MSK = Thursday 21:00 UTC).
 
     python judge/snapshot.py --round 1 --roster judge/roster.csv --dir judge/rounds/round-01
 

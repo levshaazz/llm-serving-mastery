@@ -2,7 +2,7 @@
 
 The code that measures every leaderboard submission. The same code runs on the instructor's
 RTX 5070 Ti and on your Colab T4, so you can put your repository through the same pipeline
-before Thursday.
+before the Thursday 23:59 MSK deadline.
 
 | File | What |
 |---|---|
@@ -52,7 +52,7 @@ Requirements for the judge machine:
 - `judge/requirements.txt` installed.
 
 ```bash
-# Friday 00:00, right after the Thursday 23:59 deadline (cron). Deadline time zone: see the course page.
+# Friday 00:00 Moscow time (= Thursday 21:00 UTC), right after the Thursday 23:59 MSK deadline — cron
 python3 judge/snapshot.py --round N --roster judge/roster.csv --dir judge/rounds/round-NN
 JUDGE_SEED=<new secret> judge/run_round.sh N          # measures, scores, writes data/leaderboard/round-NN*
 git add data/leaderboard && git commit -m "Round N" && scripts/publish.sh

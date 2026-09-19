@@ -12,7 +12,7 @@ Copy these files into your own **public** repository. Change anything except the
 | `JOURNAL.md` | one entry per round |
 | `Dockerfile` | optional; if present the judge builds and runs it instead of `serve.sh` (must expose 8000) |
 
-Submit a round: `git tag round-01 && git push origin round-01` before **Thursday 23:59**.
+Submit a round: `git tag round-01 && git push origin round-01` before **Thursday 23:59 Moscow time (MSK, UTC+3)**.
 
 ## Quick start (Colab or any Linux box with an NVIDIA GPU)
 
