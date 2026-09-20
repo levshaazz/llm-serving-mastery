@@ -497,7 +497,7 @@
     {
       "id": "00",
       "topic": 0,
-      "materials": {"slides": "ready", "lab": "ready", "assignment": "ready", "reading": "ready", "evidence": "needs-rehearsal"},
+      "materials": {"slides": "ready", "lab": "ready", "assignment": "ready", "reading": "ready", "evidence": "ready"},
       "deckFile": "Lectures/00-introduction.html",
       "notebook": "seminars/00-live-demo-pipeline-vs-vllm.ipynb",
       "colab": "https://colab.research.google.com/github/levshaazz/llm-serving-mastery/blob/main/seminars/00-live-demo-pipeline-vs-vllm.ipynb",

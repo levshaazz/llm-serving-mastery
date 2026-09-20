@@ -26,3 +26,5 @@ runs/
 seminars/runs/*
 !seminars/runs/README.md
 !seminars/runs/*.legacy-invalid.txt
+!seminars/runs/2026-09-20-topic-00-metric-contract-v2/
+!seminars/runs/2026-09-20-topic-00-metric-contract-v2/**

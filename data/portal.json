@@ -3,7 +3,7 @@
   "dashboard": {
     "currentTopic": 2,
     "currentRound": 1,
-    "notice": "Topic 02 is published. Topic 00 measured reference numbers remain withdrawn until a metric-contract-v2 rehearsal is captured.",
+    "notice": "Topics 00–02 are published. Topic 00 now has a canonical metric-contract-v2 rehearsal on a Tesla T4, including 630 raw request records and complete logs.",
     "next": [
       "Complete the Topic 02 notebook on a CUDA GPU.",
       "Submit benchmark JSON, profiler trace, and analysis markdown.",
@@ -70,6 +70,7 @@
     ["TTFT", "Time from the declared request start boundary until the first output token becomes observable.", 0]
   ],
   "changelog": [
+    {"date": "2026-09-20", "kind": "evidence", "text": "Published the canonical Topic 00 T4 rehearsal: metric contract v2, 630 raw request records, three repeats, complete logs, checksums, and an operator note with limitations."},
     {"date": "2026-09-20", "kind": "evidence", "text": "Upgraded the Topic 00 rehearsal to metric contract v2: three repeats, immutable model revision, raw per-request records, strict successful-only latency, and complete runtime provenance."},
     {"date": "2026-09-20", "kind": "contract", "text": "Judge preparation, image build, server start, and readiness now share one 30-minute startup budget."},
     {"date": "2026-09-20", "kind": "lab", "text": "Published the Topic 02 pinned GPU profiling notebook and evidence contract."},
@@ -81,6 +82,6 @@
     "deployment": "GitHub Actions builds Astro and lecture decks, runs contract and link checks, then deploys the artifact to Pages.",
     "judge": "Judge contract v3; 90-minute whole-run budget and one shared 30-minute startup budget for preparation, build, server start, and readiness.",
     "evidence": "Reference numbers require raw request records, environment and revision metadata, metric-contract version, and an operator note.",
-    "knownGap": "Topic 00 has no current canonical rehearsal; its old timeout-capped run is archived as legacy-invalid."
+    "knownGap": "Topic 00 reference numbers are validated only for the recorded Tesla T4, pinned model/runtime, simultaneous-wave workload, and successful-output goodput semantics; portability requires a new rehearsal."
   }
 }

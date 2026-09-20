@@ -11,5 +11,9 @@ A rehearsal is **canonical** only when its directory contains all of the followi
 
 Plain-text summaries without this provenance are historical artifacts, not evidence. The
 2026-09-19 rehearsal is intentionally named `.legacy-invalid.txt`: it used timeout-capped
-latencies and cannot validate the current lecture. A fresh canonical rehearsal is required
-before publishing measured numbers as reference results.
+latencies and cannot validate the current lecture.
+
+The current canonical run is
+[`2026-09-20-topic-00-metric-contract-v2/`](2026-09-20-topic-00-metric-contract-v2/README.md).
+Its JSON preserves 630 raw request records and complete runtime provenance; its operator note
+states the metric population, results, anomalies, and limits.
