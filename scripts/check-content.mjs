@@ -10,6 +10,10 @@ const requireFile = (path, label) => {
   if (!path || !existsSync(join(root, path))) errors.push(`${label}: missing ${path || '(unset)'}`);
 };
 
+for (const path of ['AGENTS.md', 'CODEX_HANDOFF.md', 'COURSE_GOVERNANCE.md', 'narrative/LECTURE_STANDARD.md']) {
+  requireFile(path, 'Project continuation contract');
+}
+
 for (const lecture of course.lectures) {
   const deckSource = lecture.deckFile?.replace(/\.html$/, '');
   requireFile(`${deckSource}/parts/00-head.html`, `Topic ${lecture.id} slide source`);

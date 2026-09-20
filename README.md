@@ -2,10 +2,12 @@
 
 Course site and lecture decks. Published at **https://levshaazz.github.io/llm-serving-mastery/**.
 
-The canonical-source order and archive policy are documented in [`COURSE_GOVERNANCE.md`](COURSE_GOVERNANCE.md). The old standalone DOCX syllabus and stale PDF lecturer notes are archived and are not normative.
+The canonical-source order and archive policy are documented in [`COURSE_GOVERNANCE.md`](COURSE_GOVERNANCE.md). The old standalone DOCX syllabus and stale PDF lecturer notes are archived and are not normative. To continue the project in a new Codex task or on another machine, start with [`AGENTS.md`](AGENTS.md) and [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md).
 
 | Path | What |
 |---|---|
+| `AGENTS.md` | Mandatory working rules for Codex and other coding agents. |
+| `CODEX_HANDOFF.md` | Secret-free project state, accepted decisions, blockers, and next safe actions. |
 | `data/course.json` | Course contract: topics, assessment, leaderboard rules, reading, and per-material readiness. |
 | `data/portal.json` | Student-facing topic pages, dashboard, glossary, changelog, and provenance policy. |
 | `Lectures/<slug>/parts/*.html` | Editable deck source, one fragment per slide. `npm run deck` assembles `Lectures/<slug>.html` (build output, gitignored). |

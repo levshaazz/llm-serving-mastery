@@ -9,6 +9,11 @@ This repository is the canonical course source. When two artifacts disagree, use
 
 Generated artifacts must carry the source revision used to create them or be treated as unverified. Historical files live in the parent `archive/` directory and are not course requirements.
 
+[`AGENTS.md`](AGENTS.md) and [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md) preserve the owner's working
+decisions and current continuation state for automated agents. They do not override the canonical
+course facts above. When a decision changes, update the canonical artifact and both handoff documents
+in the same reviewed change.
+
 ## Change rule
 
 A change to scoring, workload or topic coverage is complete only when the canonical data, the relevant teaching material, the executable judge and public wording agree. A new judge configuration version requires a fresh reference run; reconstructed or provenance-incomplete results cannot publish new thresholds.
