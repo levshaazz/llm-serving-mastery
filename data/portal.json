@@ -70,6 +70,7 @@
     ["TTFT", "Time from the declared request start boundary until the first output token becomes observable.", 0]
   ],
   "changelog": [
+    {"date": "2026-09-20", "kind": "evidence", "text": "Upgraded the Topic 00 rehearsal to metric contract v2: three repeats, immutable model revision, raw per-request records, strict successful-only latency, and complete runtime provenance."},
     {"date": "2026-09-20", "kind": "contract", "text": "Judge preparation, image build, server start, and readiness now share one 30-minute startup budget."},
     {"date": "2026-09-20", "kind": "lab", "text": "Published the Topic 02 pinned GPU profiling notebook and evidence contract."},
     {"date": "2026-09-20", "kind": "evidence", "text": "Withdrew the legacy Topic 00 rehearsal from canonical evidence pending a metric-contract-v2 rerun."},
