@@ -33,6 +33,9 @@ if (!/startup_timeout_s:\s*1800/.test(judgeConfig)) errors.push('Judge startup b
 if (!/PhaseDeadline\(deadline,\s*cfg\["server"\]\["startup_timeout_s"\]/.test(judgeSource)) errors.push('Judge does not share the startup phase deadline');
 if (existsSync(join(root, 'seminars/runs/00-live-demo-rehearsal-2026-09-19.txt'))) errors.push('Legacy rehearsal still has a canonical-looking filename');
 requireFile('seminars/runs/00-live-demo-rehearsal-2026-09-19.legacy-invalid.txt', 'Legacy rehearsal audit trail');
+for (const path of ['judge/OPERATIONS.md', 'judge/preflight.sh', 'judge/run_reference.sh', 'judge/roster.example.csv', 'judge/reference/README.md']) {
+  requireFile(path, 'Judge machine handoff');
+}
 
 const topic00 = course.lectures.find((lecture) => lecture.id === '00');
 if (topic00?.materials?.evidence === 'ready') {

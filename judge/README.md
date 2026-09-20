@@ -4,6 +4,11 @@ The code that measures every leaderboard submission. The same code runs on the i
 RTX 5070 Ti and on your Colab T4, so you can put your repository through the same pipeline
 before the Thursday 23:59 MSK deadline.
 
+Moving the judge to another machine or preparing an official round? Start with
+[`OPERATIONS.md`](OPERATIONS.md), then run `judge/preflight.sh`. The current Round 01 bars remain
+provisional until `judge/run_reference.sh` produces and publishes a provenance-complete config-v3
+reference on the judge GPU.
+
 | File | What |
 |---|---|
 | `run_submission.py` | measure one submission: fetch → contract → start → smoke → canary → quality (lm-eval) → speed (GuideLLM) → stop. Writes `result.json` + logs. |
@@ -14,6 +19,9 @@ before the Thursday 23:59 MSK deadline.
 | `snapshot.py` | at the deadline: mirror every repository and resolve its `round-NN` tag to a commit. |
 | `run_round.sh` | measure every snapshotted commit in the sandbox, retry judge errors once, score, publish the cleaned logs. |
 | `dry_run.sh` | Tuesdays: start-up check of every repository's default branch on the judge GPU. |
+| `preflight.sh` | Read-only host, GPU, Docker isolation, dependency and round-readiness checks. |
+| `run_reference.sh` | Produce a private config-v3 reference and promote reviewed verified bars. |
+| `OPERATIONS.md` | Machine handoff, secrets, calibration, shadow round, weekly runbook and recovery. |
 | `requirements.txt` | readable top-level judge dependencies, exactly pinned. |
 | `requirements.lock` | transitive Linux/Python 3.12 lock with hashes; install this on the judge. |
 
